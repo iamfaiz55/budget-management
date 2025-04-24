@@ -1,14 +1,12 @@
 export interface IUser {
     _id?: string
-    clinicId?: string
-    firstName: string;
-    lastName: string;
+    name: string;
+    role?: string;
     email: string;
     password?: string;
-    phone: number
+    mobile: number| string
     confirmPassword?: string
     profile?: string
-    role: 'Clinic Admin' | 'Doctor' | 'Receptionist';
     status?: 'active' | 'inactive';
     token?: string
 }

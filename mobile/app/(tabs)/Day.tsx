@@ -5,22 +5,41 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useGetAllTransactionsQuery } from '@/redux/transactionApi';
 
 const Day = () => {
-  const { data, refetch, isLoading } = useGetAllTransactionsQuery();
+  const { data, refetch, isLoading, error } = useGetAllTransactionsQuery();
   const router = useRouter();
+// console.log("errorrr", error);
+useEffect(() => {
+  
+    const checkAuth = async () => {
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) {
+        router.replace("/authentication/Login");
+      } 
+    checkAuth();
+  }
+}, []);
+
 
   const today = new Date().toISOString().split('T')[0];
   const transactions = data?.result?.filter(t => t.date === today) || [];
 
+
   const calculateTotal = (type: string) => {
     if (type === 'income') {
-      return transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+      return transactions
+        .filter(t => t.type === 'income' && !t.isTransfered)
+        .reduce((sum, t) => sum + t.amount, 0);
     } else if (type === 'expense') {
-      return transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+      return transactions
+        .filter(t => t.type === 'expense' && !t.isTransfered)
+        .reduce((sum, t) => sum + t.amount, 0);
     } else {
-      return transactions.reduce((sum, t) => sum + t.amount, 0);
+      return transactions
+        .filter(t => !t.isTransfered)
+        .reduce((sum, t) => sum + t.amount, 0);
     }
   };
-
+  
   useEffect(() => {
     const checkAuth = async () => {
       const token = await AsyncStorage.getItem("authToken");

@@ -12,6 +12,7 @@ transactionRoutes
     .post("/add-transaction", protectedRoute, transactionController.addTransaction)
     .post("/transaction-by-date", protectedRoute, transactionController.transactionsByDate)
     .get("/get-transactions", protectedRoute, transactionController.getAllTransactions)
+    .post("/add-amount-to-member", protectedRoute, transactionController.addAmountToMember)
  
 
 export default transactionRoutes

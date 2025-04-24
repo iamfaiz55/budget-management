@@ -6,6 +6,7 @@ export interface ITransaction extends Document {
     note?:string;
     category: string;
     amount:number;
+    isTransfered:boolean;
     account: string
     type:string;
     // status: 'active' | 'inactive';
@@ -17,10 +18,11 @@ const transactionSchema = new Schema<ITransaction>({
     date: { type: String, required: true },
     note: { type: String },
     type: { type: String, required:true },
-    category: { type: String, required: true },
+    category: { type: String },
     amount: { type: Number, required: true, },
+    isTransfered: { type:Boolean, default:false, },
     account: { type: String, required: true },
-  user:{type:mongoose.Schema.ObjectId, ref:"User"}
+  user:{type:mongoose.Schema.ObjectId, ref:"Users"}
 }, { timestamps: true });
 
 

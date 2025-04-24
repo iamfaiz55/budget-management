@@ -1,30 +1,76 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
-import { FaUser, FaLock, FaEnvelope, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaUser, FaMobileAlt, FaKey, FaEnvelope } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  useRegisterMutation,
+  useSendOtpRegisterMutation,
+  useVerifyRegisterMutation,
+} from "../../redux/authApi";
 
-interface RegisterFormInputs {
-  username: string;
+interface FormData {
+  name: string;
+  mobile: number;
   email: string;
-  password: string;
-  confirmPassword: string;
-  terms: boolean;  // ✅ Added this line
+  otp: string;
 }
 
 const Register: React.FC = () => {
+  const navigate = useNavigate();
+  const [registerUser] = useRegisterMutation();
+  const [sendOTP, { isSuccess: otpSent, error: otpError }] = useSendOtpRegisterMutation();
+  const [verifyOTP, { isSuccess: otpVerified, error: verifyError }] = useVerifyRegisterMutation();
+
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
-  } = useForm<RegisterFormInputs>();
+    watch,
+  } = useForm<FormData>();
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const mobile = watch("mobile");
+  const otp = watch("otp");
 
-  const onSubmit = (data: RegisterFormInputs) => {
-    console.log("Register Data:", data);
+  const [showOTP, setShowOTP] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+
+  // Handle sending OTP
+  const handleSendOTP = async () => {
+    if (!mobile || mobile.toString().length !== 10) return;
+    await sendOTP({ mobile });
   };
+
+  // Handle verifying OTP
+  const handleOTPVerification =  () => {
+    if (!otp || !mobile) return;
+  
+    try {
+       verifyOTP({ mobile, otp })
+      // console.log("OTP verified:", response);
+      setIsVerified(true); // ✅ persist success manually
+    } catch (err) {
+      console.error("OTP verification failed:", err);
+    }
+  };
+  
+
+  // Handle final registration submission
+  const handleFinalRegister = async (data: FormData) => {
+    // console.log("data : ", data);
+    
+    if (!isVerified) return;
+    await registerUser(data);
+    navigate("/login");
+  };
+
+  // React to OTP sent/verified
+  useEffect(() => {
+    if (otpSent) setShowOTP(true);
+    if (otpVerified) {
+      setIsVerified(true);
+    }
+  }, [otpSent, otpVerified, setIsVerified]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
@@ -32,116 +78,131 @@ const Register: React.FC = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full"
+        className="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full"
       >
-        <h2 className="text-3xl font-bold text-gray-900 text-center">Create an Account</h2>
-        <p className="text-gray-500 text-center mt-2">Join us and manage your finances easily</p>
+        <h2 className="text-3xl font-bold text-gray-900 text-center">Register</h2>
+        <p className="text-gray-500 text-center mt-2">Fill the form to continue</p>
 
-        <form className="mt-6" onSubmit={handleSubmit(onSubmit)}>
-          {/* Username Field */}
-          <div className="relative mb-4">
+        <form className="mt-6 space-y-4" onSubmit={handleSubmit(handleFinalRegister)}>
+          {/* Name */}
+          <div className="relative">
             <FaUser className="absolute top-3 left-3 text-gray-400" />
             <input
-              {...register("username", { required: "Username is required" })}
+              {...register("name", { required: "Name is required" })}
               type="text"
-              placeholder="Username"
+              placeholder="Full Name"
               className="w-full pl-10 p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-indigo-400"
             />
-            {errors.username?.message && (
-              <p className="text-red-500 text-sm mt-1">{String(errors.username.message)}</p>
-            )}
+            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
           </div>
 
-          {/* Email Field */}
-          <div className="relative mb-4">
+          {/* Email */}
+          <div className="relative">
             <FaEnvelope className="absolute top-3 left-3 text-gray-400" />
             <input
               {...register("email", {
                 required: "Email is required",
-                pattern: { value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, message: "Invalid email format" }
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Enter a valid email",
+                },
               })}
               type="email"
               placeholder="Email"
               className="w-full pl-10 p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-indigo-400"
             />
-            {errors.email?.message && (
-              <p className="text-red-500 text-sm mt-1">{String(errors.email.message)}</p>
-            )}
+            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
           </div>
 
-          {/* Password Field */}
-          <div className="relative mb-4">
-            <FaLock className="absolute top-3 left-3 text-gray-400" />
+          {/* Mobile + Get OTP */}
+          <div className="relative">
+            <FaMobileAlt className="absolute top-3 left-3 text-gray-400" />
             <input
-              {...register("password", {
-                required: "Password is required",
-                minLength: { value: 6, message: "Password must be at least 6 characters" },
+              {...register("mobile", {
+                required: "Mobile number is required",
+                pattern: {
+                  value: /^[0-9]{10}$/,
+                  message: "Enter a valid 10-digit number",
+                },
               })}
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              className="w-full pl-10 p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              type="tel"
+              placeholder="Mobile Number"
+              className="w-full pl-10 pr-[100px] p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              disabled={showOTP}
             />
-            <button
-              type="button"
-              className="absolute top-3 right-3 text-gray-500"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </button>
-            {errors.password?.message && (
-              <p className="text-red-500 text-sm mt-1">{String(errors.password.message)}</p>
+            {!showOTP && (
+              <button
+                type="button"
+                onClick={handleSendOTP}
+                className="absolute top-1 right-1 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-500 text-sm"
+              >
+                Get OTP
+              </button>
             )}
+            {errors.mobile && <p className="text-red-500 text-sm mt-1">{errors.mobile.message}</p>}
           </div>
 
-          {/* Confirm Password Field */}
-          <div className="relative mb-4">
-            <FaLock className="absolute top-3 left-3 text-gray-400" />
-            <input
-              {...register("confirmPassword", {
-                required: "Please confirm your password",
-                validate: value => value === watch("password") || "Passwords do not match",
-              })}
-              type={showConfirmPassword ? "text" : "password"}
-              placeholder="Confirm Password"
-              className="w-full pl-10 p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            />
-            <button
-              type="button"
-              className="absolute top-3 right-3 text-gray-500"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            >
-              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-            </button>
-            {errors.confirmPassword?.message && (
-              <p className="text-red-500 text-sm mt-1">{String(errors.confirmPassword.message)}</p>
-            )}
-          </div>
+          {/* OTP */}
+          {showOTP && (
+            <div className="space-y-2">
+              <div className="relative">
+                <FaKey className="absolute top-3 left-3 text-gray-400" />
+                <input
+                  {...register("otp", {
+                    required: "OTP is required",
+                    minLength: { value: 6, message: "OTP must be 6 digits" },
+                  })}
+                  type="text"
+                  placeholder="Enter OTP"
+                  className="w-full pl-10 p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                />
+                {errors.otp && <p className="text-red-500 text-sm mt-1">{errors.otp.message}</p>}
+              </div>
 
-          {/* Terms & Conditions */}
-          <div className="flex items-center text-sm mb-4">
-            <input type="checkbox" {...register("terms", { required: "You must accept the terms" })} className="mr-2" />
-            <p className="text-gray-600">
-              I agree to the <a href="#" className="text-indigo-500 hover:underline">Terms & Conditions</a>
-            </p>
-          </div>
-          {errors.terms && <p className="text-red-500 text-sm mb-4">{String(errors.terms.message)}</p>}
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleOTPVerification}
+                className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-500 transition"
+              >
+                Verify OTP
+              </motion.button>
 
-          {/* Register Button */}
+              {verifyError && (
+                <p className="text-red-500 text-sm text-center">Invalid OTP</p>
+              )}
+            </div>
+          )}
+
+          {/* Final Register Button */}
           <motion.button
-            type="submit"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-500 transition"
-          >
-            Register
-          </motion.button>
+  type="submit"
+  disabled={!isVerified}
+  whileHover={{ scale: isVerified ? 1.05 : 1 }}
+  whileTap={{ scale: isVerified ? 0.95 : 1 }}
+  className={`w-full py-3 rounded-lg font-semibold transition ${
+    isVerified
+      ? "bg-indigo-600 text-white hover:bg-indigo-500"
+      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+  }`}
+>
+  Register
+</motion.button>
+
         </form>
 
-        <p className="text-center text-gray-600 mt-4">
+        {/* OTP error */}
+        {otpError && (
+          <p className="text-red-500 text-sm text-center mt-4">Failed to send OTP</p>
+        )}
+
+        {/* Already have account */}
+        <p className="text-center text-gray-600 mt-6">
           Already have an account?{" "}
-          <a href="/login" className="text-indigo-500 font-semibold hover:underline">
+          <Link to="/login" className="text-indigo-500 font-semibold hover:underline">
             Login
-          </a>
+          </Link>
         </p>
       </motion.div>
     </div>

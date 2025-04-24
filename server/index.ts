@@ -10,6 +10,8 @@ import passport from "./services/passport"
 import userRouter from "./routes/user.routes";
 import { protectedRoute } from "./utils/protected";
 import transactionRoutes from "./routes/transaction.routes";
+import subscriptionRouter from "./routes/subscription.routes";
+import categoryRoutes from "./routes/category.routes";
 
 dotenv.config()
 const app = express()
@@ -27,7 +29,9 @@ app.use(cors({
 app.use(passport.initialize())
 app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/transaction", transactionRoutes)
+app.use("/api/v1/subscriptions",subscriptionRouter)
 app.use("/api/v1/user", protectedRoute, userRouter)
+app.use("/api/v1/category", protectedRoute, categoryRoutes)
 
 
 redisClient.on("connect", () => {

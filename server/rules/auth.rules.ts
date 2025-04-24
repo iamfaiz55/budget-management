@@ -1,13 +1,9 @@
 import { validationRulesSchema } from "../utils/validator";
 
 export const registerRules: validationRulesSchema = {
-    name: { required: true },
+    username: { required: true },
     email: { required: true, email: true },
-    phone: {
-        required: true, pattern: /^[6-9]\d{9}$/
-    },
     password: { required: true, min: 8, max: 16 },
-    role: { required: true },
     profile: { required: false },
 }
 

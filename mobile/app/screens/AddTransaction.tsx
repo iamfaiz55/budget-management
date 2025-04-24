@@ -15,12 +15,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { ScrollView } from "react-native-gesture-handler";
 import { useAddTransactionMutation } from "@/redux/transactionApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
+import { useGetCategoriesQuery } from "@/redux/categoryApi";
 
-const initialCategories = ["Food", "Transport", "Shopping", "Salary", "Other"];
 const accounts = ["Cash", "Card", "Account"];
 
 const AddTransactionScreen = () => {
-  const [addTransaction, {isSuccess, isLoading, isError, error}]= useAddTransactionMutation()
+  const {data}=useGetCategoriesQuery()
+  const [addTransaction, {isSuccess,  isError, error}]= useAddTransactionMutation()
     const today = new Date().toISOString().split('T')[0];
   const route = useRouter();
   const { date } = useLocalSearchParams();
@@ -42,9 +44,11 @@ const AddTransactionScreen = () => {
   const [newCategory, setNewCategory] = useState("");
   const [isNewCategoryModalVisible, setNewCategoryModalVisible] = useState(false);
 
-  const handleTransactionType = (type: string) => {
+  const handleTransactionType = (type:string) => {
     setTransactionType(type);
     setValue("type", type);
+    setSelectedCategory(""); // Reset category on type switch
+    setValue("category", "");
   };
 
   const handleCategorySelect = (category: string) => {
@@ -55,7 +59,7 @@ const AddTransactionScreen = () => {
 
   const handleAddCategory = () => {
     if (newCategory.trim() !== "") {
-      initialCategories.push(newCategory);
+      // initialCategories.push(newCategory);
       setSelectedCategory(newCategory);
       setValue("category", newCategory);
       setNewCategory("");
@@ -64,25 +68,44 @@ const AddTransactionScreen = () => {
   };
 
   const onSubmit = (data: any) => {
-    console.log("Transaction Data:", { ...data, date:date ? date : today });
+    // console.log("Transaction Data:", { ...data, date:date ? date : today });
     addTransaction({ ...data, date:date ? date : today })
     
   };
 
+ 
   useEffect(() => {
+    if (isError && error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Transaction Failed',
+        text2: error as string, 
+        position: 'bottom',
+      });
+    }
+  }, [isError, error]);
+  useEffect(() => {
+    if (isError && error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Transaction Failed',
+        text2: error as string, 
+        position: 'bottom',
+      });
+    }
     if(isSuccess){
-      console.log("transaction addded success");
-      
+      // console.log("transaction addded success");
+      Toast.show({
+        type: 'success',
+        text1: 'Transaction Success',
+        // text2: , 
+        position: 'bottom',
+      });
       route.back()
     }
-  }, [isSuccess]);
-  useEffect(() => {
-    if(isError){
-      console.log("transaction error", error);
-      
-      // route.back()/
-    }
-  }, [isError]);
+  }, [isError,isSuccess]);
+  
+  
   const router = useRouter()
 
   useEffect(() => {
@@ -96,6 +119,8 @@ const AddTransactionScreen = () => {
  
      
    }, []);
+   const filteredCategories = data?.result?.filter((cat) => cat.type === transactionType) || [];
+
   return (
     <PaperProvider>
       <View style={styles.container}>
@@ -110,7 +135,7 @@ const AddTransactionScreen = () => {
         <ScrollView keyboardShouldPersistTaps="handled" nestedScrollEnabled={true} contentContainerStyle={{ paddingBottom: 20 }}>
           {/* 1. Transaction Type Selection */}
           <View style={styles.selectionContainer}>
-            {["income", "expense", "transfer"].map((type) => (
+            {["income", "expense"].map((type) => (
               <Button
                 key={type}
                 mode={transactionType === type ? "contained" : "outlined"}
@@ -174,10 +199,7 @@ const AddTransactionScreen = () => {
             {selectedCategory ? selectedCategory : "Select Category"}
           </Button>
 
-          {/* Add New Category Button */}
-          <Button mode="text" onPress={() => setNewCategoryModalVisible(true)} style={styles.addCategoryButton}>
-            + Add New Category
-          </Button>
+          
 
           {/* 6. Note Field */}
           <Controller
@@ -198,11 +220,15 @@ const AddTransactionScreen = () => {
         <Portal>
           <Modal visible={isCategoryModalVisible} onDismiss={() => setCategoryModalVisible(false)} contentContainerStyle={styles.modalContainer}>
             <Text>Select a Category</Text>
-            {initialCategories.map((category) => (
-              <Button key={category} onPress={() => handleCategorySelect(category)} >
-                {category}
-              </Button>
-            ))}
+            {filteredCategories.length > 0 ? (
+              filteredCategories.map((category) => (
+                <Button key={category._id} onPress={() => handleCategorySelect(category.name)}>
+                  {category.name}
+                </Button>
+              ))
+            ) : (
+              <Text style={{ marginTop: 10 }}>No categories found for {transactionType}</Text>
+            )}
           </Modal>
         </Portal>
 

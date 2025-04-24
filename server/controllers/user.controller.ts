@@ -11,40 +11,42 @@ import { IUserProtected } from "../utils/protected"
 import { welcomeTemplate } from "../templates/welcomeTemplate"
 // import { Doctor } from "../models/Doctor"
 
-// Get All Users
 export const getAllUsers = asyncHandler(async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-    const { page = 1, limit = 10, searchQuery = "", isFetchAll = false } = req.query
+    const { page = 1, limit = 1, searchQuery = "", isFetchAll = false } = req.query;
 
-    const currentPage = parseInt(page as string)
-    const pageLimit = parseInt(limit as string)
-    const skip: number = (currentPage - 1) * pageLimit
+    const currentPage = parseInt(page as string);
+    const pageLimit = parseInt(limit as string);
+    const skip: number = (currentPage - 1) * pageLimit;
 
     const query = {
         $and: [
-            { role: { $ne: "Super Admin" } },
+            { role: { $ne: "admin" } }, // 🚫 Exclude admin users
             searchQuery
                 ? {
-                    $or: [
-                        { firstName: { $regex: searchQuery, $options: "i" } },
-                        { lastName: { $regex: searchQuery, $options: "i" } },
-                        { email: { $regex: searchQuery, $options: "i" } },
-                    ]
-                }
+                      $or: [
+                          { email: { $regex: searchQuery, $options: "i" } },
+                          { mobile: { $regex: searchQuery, $options: "i" } },
+                          { name: { $regex: searchQuery, $options: "i" } }
+                      ]
+                  }
                 : {}
         ]
-    }
+    };
 
-    const totalUsers = await User.countDocuments(query)
-    const totalPages = Math.ceil(totalUsers / pageLimit)
+    const totalUsers = await User.countDocuments(query);
+    const totalPages = Math.ceil(totalUsers / pageLimit);
 
-    let result = []
-    if (isFetchAll) {
-        result = await User.find().select("-password -__v").lean()
+    let result = [];
+    if (isFetchAll && searchQuery) {
+        result = await User.find(query).select("-password -__v").lean();
     } else {
-        result = await User.find(query).select("-password -__v").skip(skip).limit(pageLimit).lean()
+        result = await User.find(query).select("-password -__v").skip(skip).limit(pageLimit).lean();
     }
-    res.status(200).json({ message: "Users Fetch successfully", result, totalPages, totalUsers })
-})
+
+    res.status(200).json({ message: "Users fetched successfully", result, totalPages, totalUsers });
+});
+
+
 
 // Get Clinic By Id
 export const getUserById = asyncHandler(async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -184,4 +186,6 @@ export const deleteUser = asyncHandler(async (req: Request, res: Response, next:
 
     res.status(200).json({ message: "User delete successfully" })
 })
+
+
 

@@ -8,12 +8,13 @@ const upload = multerMiddleware()
 const authRouter = express.Router()
 
 authRouter
-    .post("/sign-in", authController.signIn)
-    .post("/register", authController.register)
+    .post("/send-otp-register", authController.requestRegistrationOTP)
+    .post("/verify-register", authController.verifyRegistrationOTP)
+    .post("/register", authController.registerUser)
     .post("/sign-out",  authController.signOut)
-    .post("/send-otp", authController.sendOTP)
+    .post("/send-otp", authController.sendOTPForLogin)
     .post("/verify-otp", authController.verifyOTP)
-    .post("/forgot-password", authController.forgotPassword)
-    .put("/reset-password", authController.resetPassword)
+    .post("/google-login", authController.googleLoginMobile)
+
 
 export default authRouter

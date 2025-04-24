@@ -17,13 +17,16 @@ const CalendarScreen: React.FC = () => {
   useEffect(() => {
     if (data) {
       const groupedTransactions: Record<string, { amount: number, type:string }[]> = {};
-      data.result.forEach((transaction: any) => {
-        const date = transaction.date; // Ensure date format is YYYY-MM-DD
+      const nonTransferTransactions = data.result.filter((transaction: any) => !transaction.isTransfered);
+
+      nonTransferTransactions.forEach((transaction: any) => {
+        const date = transaction.date;
         if (!groupedTransactions[date]) {
           groupedTransactions[date] = [];
         }
-        groupedTransactions[date].push({ amount: transaction.amount, type:transaction.type });
+        groupedTransactions[date].push({ amount: transaction.amount, type: transaction.type });
       });
+      
       setTransactions(groupedTransactions);
     }
   }, [data]);
@@ -48,7 +51,7 @@ const CalendarScreen: React.FC = () => {
     // console.log("Expense:", expense);
   
     return { 
-      total: income - expense,  // Corrected to ensure correct net calculation
+      total: income - expense,  
       hasIncome: income > 0, 
       hasExpense: expense > 0 
     };

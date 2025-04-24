@@ -4,12 +4,11 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { RootState } from "./store";
 import { IUser } from "../models/user.interface";
 
-// Custom base query that retrieves the token from Redux
 const baseQuery = fetchBaseQuery({
     baseUrl: "http://localhost:5000/api/v1/auth",
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
-        const token = (getState() as RootState).auth?.token; 
+        const token = (getState() as RootState).auth?.token || ""; 
         if (token) {
             headers.set("Authorization", `Bearer ${token}`);
         }
@@ -17,17 +16,25 @@ const baseQuery = fetchBaseQuery({
     },
 });
 
+//  .post("/send-otp-register", authController.requestRegistrationOTP)
+//     .post("/verify-register", authController.verifyRegistrationOTP)
+//     .post("/register", authController.registerUser)
 // Create API service
 export const authApi = createApi({
     reducerPath: "authApi",
     baseQuery,
     endpoints: (builder) => ({
-        signIn: builder.mutation<{ message: string; result: IUser }, { email: string; password: string }>({
+        signIn: builder.mutation<{ message: string; result:{otp:string}}, {username:string }>({
             query: (userData) => ({
-                url: "/sign-in",
+                url: "/send-otp",
                 method: "POST",
                 body: userData,
             }),
+            transformResponse(data: { message: string; result: { otp: string } }) {
+                localStorage.setItem("loginOtp", JSON.stringify(data.result.otp));
+                return data; // ✅ Ensure the response is returned
+            },
+            transformErrorResponse: (error: { status: number; data: { message: string } }) => error.data.message,
         }),
 
         signOut: builder.mutation<{ message: string }, void>({
@@ -38,29 +45,61 @@ export const authApi = createApi({
         }),
 
 
-        register: builder.mutation<{ message: string }, any>({
+        sendOtpRegister: builder.mutation<{ message: string; result: { otp: string , mobile:number} }, {  mobile: number }>({
+            query: (userData) => ({
+                url: "/send-otp-register",
+                method: "POST",
+                body: userData,
+            }),
+            transformResponse(data: { message: string; result: { otp: string , mobile:number} }) {
+          
+                
+                return data; // ✅ Ensure the response is returned
+            },
+        }),
+        verifyRegister: builder.mutation<{ message: string; result:  IUser  }, { otp: string; mobile: number }>({
+            query: (userData) => ({
+                url: "/verify-register",
+                method: "POST",
+                body: userData,
+            }),
+            transformResponse(data: { message: string; result: IUser }) {
+          
+                
+                return data; 
+            },
+        }),
+        
+        register: builder.mutation<{ message: string; result: IUser }, { name: string; mobile: number }>({
             query: (userData) => ({
                 url: "/register",
                 method: "POST",
                 body: userData,
             }),
+            transformResponse(data: { message: string; result: IUser }) {
+          
+                
+                return data; // ✅ Ensure the response is returned
+            },
         }),
 
-        forgotPassword: builder.mutation<{ message: string }, string>({
-            query: (email) => ({
-                url: "/forgot-password",
+        verifyOtp: builder.mutation<{ message: string, result: IUser  }, {username:string, otp:string}>({
+            query: (otp) => ({
+                url: "/verify-otp",
                 method: "POST",
-                body: { email },
+                body: otp ,
             }),
         }),
+         googleLogin: builder.mutation<{ message: string; result:  IUser  }, { idToken:string }>({
+                    query: (userData) => ({
+                        url: "/google-login",
+                        method: "POST",
+                        body: userData, 
+                    }),
+                    transformResponse: (data: { message: string, result: IUser  }) => data,
+                }),
 
-        resetPassword: builder.mutation<{ message: string }, { password: string; confirmPassword: string; token: string }>({
-            query: (passwordData) => ({
-                url: "/reset-password",
-                method: "PUT",
-                body: passwordData,
-            }),
-        }),
+        
     }),
 });
 
@@ -68,7 +107,9 @@ export const authApi = createApi({
 export const {
     useSignInMutation,
     useSignOutMutation,
-    useForgotPasswordMutation,
-    useResetPasswordMutation,
     useRegisterMutation,
+    useVerifyOtpMutation,
+    useSendOtpRegisterMutation,
+    useVerifyRegisterMutation,
+    useGoogleLoginMutation
 } = authApi;

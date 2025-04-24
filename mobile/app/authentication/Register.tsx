@@ -1,453 +1,292 @@
-// import { useEffect, useState } from "react";
-// import { Image, StyleSheet, View, Animated } from "react-native";
-// import { TextInput, Text, Button } from "react-native-paper";
-// import { useRouter } from "expo-router";
-// import { useForm, Controller } from "react-hook-form";
-
-// const Register = () => {
-//     const router = useRouter();
-//     const { control, handleSubmit, watch } = useForm({
-//         defaultValues: {
-//             name: "",
-//             email: "",
-//             password: "",
-//             confirmPassword: "",
-//             role: "",
-//             image: "",
-//             phone: ""
-//         }
-//     });
-//     const password = watch("password");
-//     const fadeAnim = useState(new Animated.Value(0))[0];
-
-//     useEffect(() => {
-//         Animated.timing(fadeAnim, {
-//             toValue: 1,
-//             duration: 800,
-//             useNativeDriver: true,
-//         }).start();
-//     }, []);
-
-//     const handleRegister = async (data:any) => {
-//         if (data.password !== data.confirmPassword) {
-//             alert("Passwords do not match");
-//             return;
-//         }
-//         try {
-//             console.log("user data", data);
-//         } catch (err) {
-//             console.error(err);
-//         }
-//     };
-
-//     return (
-//         <View style={styles.container}>
-//             <Animated.View style={[styles.header, { opacity: fadeAnim }]}>  
-//                 <Image
-//                     style={styles.logo}
-//                     source={{ uri: "https://img.icons8.com/?size=100&id=lQ4UQO3LMB5D&format=png&color=FF7043" }}
-//                 />
-//             </Animated.View>
-
-//             <Text style={styles.title}>Create an Account</Text>
-
-//             <Animated.View style={[styles.form, { opacity: fadeAnim }]}>  
-//                 <Controller
-//                     control={control}
-//                     name="name"
-//                     render={({ field: { onChange, value } }) => (
-//                         <TextInput
-//                             mode="outlined"
-//                             label="Full Name"
-//                             value={value}
-//                             onChangeText={onChange}
-//                             style={styles.input}
-//                         />
-//                     )}
-//                 />
-//                 <Controller
-//                     control={control}
-//                     name="email"
-//                     render={({ field: { onChange, value } }) => (
-//                         <TextInput
-//                             mode="outlined"
-//                             label="Email Address"
-//                             value={value}
-//                             onChangeText={onChange}
-//                             keyboardType="email-address"
-//                             autoCapitalize="none"
-//                             left={<TextInput.Icon icon="email" />}
-//                             style={styles.input}
-//                         />
-//                     )}
-//                 />
-//                 <Controller
-//                     control={control}
-//                     name="password"
-//                     render={({ field: { onChange, value } }) => (
-//                         <TextInput
-//                             mode="outlined"
-//                             label="Password"
-//                             value={value}
-//                             onChangeText={onChange}
-//                             secureTextEntry
-//                             left={<TextInput.Icon icon="lock" />}
-//                             style={styles.input}
-//                         />
-//                     )}
-//                 />
-//                 <Controller
-//                     control={control}
-//                     name="confirmPassword"
-//                     render={({ field: { onChange, value } }) => (
-//                         <TextInput
-//                             mode="outlined"
-//                             label="Confirm Password"
-//                             value={value}
-//                             onChangeText={onChange}
-//                             secureTextEntry
-//                             left={<TextInput.Icon icon="lock-check" />}
-//                             style={styles.input}
-//                         />
-//                     )}
-//                 />
-//                 <Controller
-//                     control={control}
-//                     name="role"
-//                     render={({ field: { onChange, value } }) => (
-//                         <TextInput
-//                             mode="outlined"
-//                             label="Role"
-//                             value={value}
-//                             onChangeText={onChange}
-//                             style={styles.input}
-//                         />
-//                     )}
-//                 />
-//                 <Controller
-//                     control={control}
-//                     name="phone"
-//                     render={({ field: { onChange, value } }) => (
-//                         <TextInput
-//                             mode="outlined"
-//                             label="Phone Number"
-//                             value={value}
-//                             onChangeText={onChange}
-//                             keyboardType="phone-pad"
-//                             style={styles.input}
-//                         />
-//                     )}
-//                 />
-//                 <Controller
-//                     control={control}
-//                     name="image"
-//                     render={({ field: { onChange, value } }) => (
-//                         <TextInput
-//                             mode="outlined"
-//                             label="Profile Image URL"
-//                             value={value}
-//                             onChangeText={onChange}
-//                             style={styles.input}
-//                         />
-//                     )}
-//                 />
-
-//                 <Button
-//                     mode="contained"
-//                     onPress={handleSubmit(handleRegister)}
-//                     style={styles.button}
-//                 >
-//                     Sign Up
-//                 </Button>
-//             </Animated.View>
-//         </View>
-//     );
-// };
-
-// export default Register;
-
-// const styles = StyleSheet.create({
-//     container: {
-//         flex: 1,
-//         padding: 20,
-//         justifyContent: "center",
-//         backgroundColor: "#FFE0B2",
-//     },
-//     header: {
-//         alignItems: "center",
-//         marginBottom: 20,
-//     },
-//     logo: {
-//         width: 100,
-//         height: 100,
-//     },
-//     title: {
-//         textAlign: "center",
-//         fontSize: 22,
-//         fontWeight: "bold",
-//         marginBottom: 20,
-//         color: "#D84315",
-//     },
-//     form: {
-//         backgroundColor: "#FFFFFF",
-//         padding: 25,
-//         borderRadius: 15,
-//         shadowColor: "#000",
-//         shadowOpacity: 0.1,
-//         shadowRadius: 10,
-//         elevation: 5,
-//     },
-//     input: {
-//         backgroundColor: "#FFFFFF",
-//         marginBottom: 10,
-//         borderRadius: 10,
-//     },
-//     button: {
-//         marginTop: 10,
-//         backgroundColor: "#FF7043",
-//         borderRadius: 10,
-//         paddingVertical: 8,
-//     },
-// });
-import { useEffect, useRef, useState } from "react";
-import { Image, StyleSheet, View, Animated } from "react-native";
+import { useEffect, useState } from "react";
+import { StyleSheet, View, Animated, Image } from "react-native";
 import { TextInput, Text, Button } from "react-native-paper";
-import * as ImagePicker from "expo-image-picker";
-import { Link, useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
-import { useRegisterMutation } from "@/redux/authApi";
+import { useRouter } from "expo-router";
+import { useRegisterMutation, useSendOtpRegisterMutation, useVerifyRegisterMutation } from "@/redux/authApi";
 
 const Register = () => {
-    const router = useRouter();
-    const [register, {isSuccess, isError , error}]= useRegisterMutation()
-    const { control, handleSubmit, watch, setValue } = useForm({
-        defaultValues: {
-            name: "",
-            email: "",
-            password: "",
-            confirmPassword: "",
-            role: "user",
-            phone: ""
-        }
-    });
-    const password = watch("password");
-    const fadeAnim = useState(new Animated.Value(0))[0];
+  const router = useRouter();
 
-    useEffect(() => {
-        Animated.timing(fadeAnim, {
-            toValue: 1,
-            duration: 800,
-            useNativeDriver: true,
-        }).start();
-    }, []);
+  const fadeAnim = useState(new Animated.Value(0))[0];
+  const { control, handleSubmit, watch, formState: { errors } } = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      mobile: "",
+      otp: "",
+    },
+  });
 
-    const handleRegister = async (data:any) => {
-        if (data.password !== data.confirmPassword) {
-            alert("Passwords do not match");
-            return;
-        }
-        try {
-            console.log("User registered:", data);
-            register(data)
-        } catch (err) {
-            console.error("Registration error:", err);
-        }
-    };
+  const name = watch("name");
+  const email = watch("email");
+  const mobile = watch("mobile");
+  const otp = watch("otp");
+
+  const [sendOTP, { isSuccess: otpSent, error: otpError }] = useSendOtpRegisterMutation();
+  const [verifyOTP, { isSuccess: otpVerified, error: verifyError }] = useVerifyRegisterMutation();
+  const [registerUser] = useRegisterMutation();
+
+  const [showOTP, setShowOTP] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
-    
-    if(isSuccess){
-console.log("regitered successfully");
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 800,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
+  useEffect(() => {
+    if (otpSent) setShowOTP(true);
+    if (otpVerified) setIsVerified(true);
+  }, [otpSent, otpVerified]);
+
+  const handleSendOTP = async () => {
+    if (!mobile || mobile.length !== 10) {
+      alert("Enter a valid 10-digit number");
+      return;
+    }
+    await sendOTP({ mobile });
+  };
+
+  const handleVerifyOTP = async () => {
+    if (!otp || otp.length < 4) {
+      alert("Enter a valid OTP");
+      return;
+    }
+    try {
+      await verifyOTP({ mobile, otp }).unwrap();
+      setIsVerified(true);
+    } catch (error) {
+      alert("Invalid OTP");
+    }
+  };
+
+  const handleRegister = async (data: any) => {
+    if (!isVerified) {
+      alert("Please verify OTP first");
+      return;
+    }
+
+    const payload = {
+      name: data.name,
+      email: data.email,
+      mobile: data.mobile,
     };
-    if(isError){
-console.log("regitered successfully");
 
-    };
-  }, [isSuccess, isError]);
+    try {
+      await registerUser(payload).unwrap();
+      router.push("/authentication/Login");
+    } catch (err) {
+      console.error("Registration error:", err);
+    }
+  };
 
+  return (
+    <View style={styles.container}>
+      <Animated.View style={[styles.header, { opacity: fadeAnim }]}>
+        <Image
+          style={styles.logo}
+          source={{ uri: "https://cdn-icons-png.flaticon.com/128/1077/1077063.png" }}
+        />
+      </Animated.View>
 
-    return (
-        <View style={styles.container}>
-            <Animated.View style={[styles.header, { opacity: fadeAnim }]}>  
-                <Image
-                    style={styles.logo}
-                    source={{ uri: "https://cdn-icons-png.flaticon.com/128/1077/1077063.png" }}
-                />
-            </Animated.View>
+      <Text style={styles.title}>Register</Text>
 
-            <Text style={styles.title}>Create Your Account</Text>
+      <Animated.View style={[styles.form, { opacity: fadeAnim }]}>
+        {/* Name */}
+        <Controller
+          control={control}
+          name="name"
+          rules={{ required: "Name is required" }}
+          render={({ field: { onChange, value } }) => (
+            <TextInput
+              label="Full Name"
+              value={value}
+              onChangeText={onChange}
+              mode="outlined"
+              style={styles.input}
+              left={<TextInput.Icon icon="account" />}
+              error={!!errors.name}
+            />
+          )}
+        />
+        {errors.name && <Text style={styles.errorText}>{errors.name.message}</Text>}
 
-            <Animated.View style={[styles.form, { opacity: fadeAnim }]}>  
-                <Controller
-                    control={control}
-                    name="name"
-                    render={({ field: { onChange, value } }) => (
-                        <TextInput
-                            mode="outlined"
-                            label="Full Name"
-                            value={value}
-                            onChangeText={onChange}
-                            style={styles.input}
-                            left={<TextInput.Icon icon="account" />}
-                        />
-                    )}
-                />
-                <Controller
-                    control={control}
-                    name="email"
-                    render={({ field: { onChange, value } }) => (
-                        <TextInput
-                            mode="outlined"
-                            label="Email Address"
-                            value={value}
-                            onChangeText={onChange}
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                            left={<TextInput.Icon icon="email" />}
-                            style={styles.input}
-                        />
-                    )}
-                />
-                <Controller
-                    control={control}
-                    name="password"
-                    render={({ field: { onChange, value } }) => (
-                        <TextInput
-                            mode="outlined"
-                            label="Password"
-                            value={value}
-                            onChangeText={onChange}
-                            secureTextEntry
-                            left={<TextInput.Icon icon="lock" />}
-                            style={styles.input}
-                        />
-                    )}
-                />
-                <Controller
-                    control={control}
-                    name="confirmPassword"
-                    render={({ field: { onChange, value } }) => (
-                        <TextInput
-                            mode="outlined"
-                            label="Confirm Password"
-                            value={value}
-                            onChangeText={onChange}
-                            secureTextEntry
-                            left={<TextInput.Icon icon="lock-check" />}
-                            style={styles.input}
-                        />
-                    )}
-                />
-       
-                <Controller
-                    control={control}
-                    name="phone"
-                    render={({ field: { onChange, value } }) => (
-                        <TextInput
-                            mode="outlined"
-                            label="Phone Number"
-                            value={value}
-                            onChangeText={onChange}
-                            keyboardType="phone-pad"
-                            style={styles.input}
-                            left={<TextInput.Icon icon="phone" />}
+        {/* Email */}
+        <Controller
+          control={control}
+          name="email"
+          rules={{
+            required: "Email is required",
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: "Invalid email format",
+            },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <TextInput
+              label="Email"
+              value={value}
+              onChangeText={onChange}
+              mode="outlined"
+              style={styles.input}
+              left={<TextInput.Icon icon="email" />}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              error={!!errors.email}
+            />
+          )}
+        />
+        {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
 
-                        />
-                    )}
+        {/* Mobile */}
+        <Controller
+          control={control}
+          name="mobile"
+          rules={{
+            required: "Mobile number is required",
+            pattern: {
+              value: /^[0-9]{10}$/,
+              message: "Enter a valid 10-digit number",
+            },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <TextInput
+              label="Mobile Number"
+              value={value}
+              onChangeText={onChange}
+              mode="outlined"
+              style={styles.input}
+              left={<TextInput.Icon icon="phone" />}
+              keyboardType="number-pad"
+              disabled={showOTP}
+              error={!!errors.mobile}
+            />
+          )}
+        />
+        {errors.mobile && <Text style={styles.errorText}>{errors.mobile.message}</Text>}
+
+        {!showOTP && (
+          <Button mode="contained" onPress={handleSendOTP} style={styles.button}>
+            Get OTP
+          </Button>
+        )}
+
+        {/* OTP */}
+        {showOTP && (
+          <>
+            <Controller
+              control={control}
+              name="otp"
+              rules={{ required: "OTP is required", minLength: { value: 4, message: "Enter valid OTP" } }}
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  label="Enter OTP"
+                  value={value}
+                  onChangeText={onChange}
+                  mode="outlined"
+                  style={styles.input}
+                  left={<TextInput.Icon icon="key" />}
+                  keyboardType="number-pad"
+                  error={!!errors.otp}
                 />
-              
-                <Button
-                    mode="contained"
-                    onPress={handleSubmit(handleRegister)}
-                    style={styles.button}
-                >
-                    Register Now
-                </Button>
-               <Link href={"/authentication/Login"} style={styles.forgotPassword}>Already Have Account</Link>
-                
-            </Animated.View>
-        </View>
-    );
+              )}
+            />
+            {errors.otp && <Text style={styles.errorText}>{errors.otp.message}</Text>}
+
+            <Button mode="contained" onPress={handleVerifyOTP} style={[styles.button, { backgroundColor: "#43A047" }]}>
+              Verify OTP
+            </Button>
+
+            {verifyError && <Text style={styles.errorText}>Invalid OTP</Text>}
+          </>
+        )}
+
+        {/* Final Submit */}
+        <Button
+          mode="contained"
+          onPress={handleSubmit(handleRegister)}
+          disabled={!isVerified}
+          style={[styles.button, !isVerified && styles.disabledButton]}
+        >
+          Register
+        </Button>
+
+        {otpError && <Text style={styles.errorText}>Failed to send OTP</Text>}
+
+        <Text style={styles.loginText}>
+          Already have an account?{" "}
+          <Text style={styles.loginLink} onPress={() => router.push("/authentication/Login")}>
+            Login
+          </Text>
+        </Text>
+      </Animated.View>
+    </View>
+  );
 };
 
 export default Register;
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-        justifyContent: "center",
-        backgroundColor: "#E3F2FD",
-    },
-    header: {
-        alignItems: "center",
-        marginBottom: 20,
-    },
-    logo: {
-        width: 100,
-        height: 100,
-    },
-    title: {
-        textAlign: "center",
-        fontSize: 22,
-        fontWeight: "bold",
-        marginBottom: 20,
-        color: "#1976D2",
-    },
-    form: {
-        backgroundColor: "#FFFFFF",
-        padding: 25,
-        borderRadius: 15,
-        shadowColor: "#000",
-        shadowOpacity: 0.1,
-        shadowRadius: 10,
-        elevation: 5,
-    },
-    input: {
-        backgroundColor: "#FFFFFF",
-        marginBottom: 10,
-        borderRadius: 10,
-    },
-    button: {
-        marginTop: 10,
-        backgroundColor: "#42A5F5",
-        borderRadius: 10,
-        paddingVertical: 8,
-    },
-    profileImage: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        alignSelf: "center",
-        marginVertical: 10,
-    },
-    imagePickerContainer: {
-      alignItems: "center",
-      marginBottom: 15,
-      backgroundColor: "#F5F5F5",
-      padding: 15,
-      borderRadius: 10,
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: "center",
+    backgroundColor: "#E3F2FD",
   },
-  imagePreview: {
-      width: 100,
-      height: 100,
-      borderRadius: 50,
-      marginBottom: 10,
-      borderWidth: 2,
-      borderColor: "#42A5F5",
+  header: {
+    alignItems: "center",
+    marginBottom: 20,
   },
-  forgotPassword: {
+  logo: {
+    width: 100,
+    height: 100,
+  },
+  title: {
     textAlign: "center",
-    color: "#007BFF",
-    marginVertical: 5,
-},
-  // button: {
-  //     marginTop: 10,
-  //     backgroundColor: "#42A5F5",
-  //     borderRadius: 10,
-  //     paddingVertical: 8,
-  // },
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#1976D2",
+  },
+  form: {
+    backgroundColor: "#FFFFFF",
+    padding: 25,
+    borderRadius: 15,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  input: {
+    backgroundColor: "#FFFFFF",
+    marginBottom: 10,
+    borderRadius: 10,
+  },
+  button: {
+    marginTop: 10,
+    backgroundColor: "#42A5F5",
+    borderRadius: 10,
+    paddingVertical: 8,
+  },
+  disabledButton: {
+    backgroundColor: "#B0BEC5",
+  },
+  errorText: {
+    color: "#E53935",
+    fontSize: 12,
+    marginBottom: 5,
+  },
+  loginText: {
+    textAlign: "center",
+    marginTop: 15,
+    color: "#455A64",
+  },
+  loginLink: {
+    color: "#1976D2",
+    fontWeight: "bold",
+  },
 });
-
-

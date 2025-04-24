@@ -1,1 +1,18 @@
 @import "tailwindcss";
+
+  .fc .fc-button {
+    background-color: #2563eb !important; /* Darker Blue */
+    color: white !important;
+    border: none !important;
+    padding: 6px 12px !important;
+    font-weight: bold;
+  }
+  
+  .fc .fc-button:hover {
+    background-color: #1e40af !important; /* Even Darker Blue */
+  }
+  
+  .fc .fc-button-active {
+    background-color: #1d4ed8 !important; /* Active button */
+  }
+  

@@ -5,69 +5,81 @@ import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSignOutMutation } from "@/redux/authApi";
-
+import {  useGetMyPlanQuery } from "@/redux/subscriptionApi";
+import { IUser } from "@/models/user.interface";
+import { useGetAllTransactionsQuery } from "@/redux/transactionApi";
+import { RefreshControl } from "react-native-gesture-handler";
+// import { useGetAllTransactionsQuery } from "@/redux/transactionApi";
+// import { useGetAllTransactionsQuery } from "@/redux/transactionApi";
 
 const Account = () => {
-    const [selectedMonth, setSelectedMonth] = useState("March 2025");
-    const router = useRouter()
-const [logout, {isSuccess, }]= useSignOutMutation()
-    useEffect(() => {
-       const checkAuth = async () => {
+  // const {data:AllTransaction, {isSuccess:allTransactionGetSuccess}}= useGetAllTransactionsQuery()
+   const [myData, setMyData] = useState<{name:string, email:string}| null>();
+   const { data: myPlan, isLoading: loadingPlan, error } = useGetMyPlanQuery();
+   const router = useRouter()
+   const [logout, {isSuccess, }]= useSignOutMutation()
+// console.log("my plan error :", error);
+
+   const {data:allTransactions, refetch,isLoading}= useGetAllTransactionsQuery()
+   useEffect(() => {
+      const checkAuth = async () => {
          const token = await AsyncStorage.getItem("authToken");
-         if (!token) {
-           router.replace("/authentication/Login");
-         }
+             if (!token) {
+                  router.replace("/authentication/Login");
+             }
        };
        checkAuth();
    
        
-     }, []);
+  }, []);
 
-    useEffect(() => {
+  useEffect(() => {
       
      if(isSuccess){
-      console.log("user logout Success");
+      // console.log("user logout Success");
       
       router.replace("/authentication/Login")
      }
     }, [isSuccess]);
 
 
-//     const x = async()=>{
-// const y = await AsyncStorage.getItem("authToken")
-// console.log("gettt", y);
-
-//     }
-  return <ScrollView>
+    
+    useEffect(() => {
+      const fetchUser = async () => {
+        const userString = await AsyncStorage.getItem("user");
+  
+        if (userString) {
+          const userData: IUser = JSON.parse(userString);
+          setMyData(userData);
+        } else {
+          console.warn("No user data found in AsyncStorage.");
+        }
+      };
+    
+      fetchUser();
+    }, []);
+    
+  return <ScrollView     refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}>
     <View style={styles.container}>
       {/* Profile Card */}
       <View style={styles.profileCard}>
-        <Image source={{ uri: "https://via.placeholder.com/100" }} style={styles.avatar} />
+        {/* <Image source={{ uri: "https://via.placeholder.com/100" }} style={styles.avatar} /> */}
         <View style={styles.userInfo}>
-          <Text style={styles.userName}>John Doe</Text>
-          <Text style={styles.userEmail}>johndoe@example.com</Text>
+          <Text style={styles.userName}>{myData && myData.name}</Text>
+          <Text style={styles.userEmail}>{myData && myData.email}</Text>
         </View>
       </View>
 
       <View style={styles.spendingSummaryCard}>
-          {/* Date Picker */}
-          <Text style={styles.sectionTitle}>Select Month:</Text>
-          <Picker
-            selectedValue={selectedMonth}
-            style={styles.picker}
-            onValueChange={(itemValue) => setSelectedMonth(itemValue)}
-          >
-            <Picker.Item label="March 2025" value="March 2025" />
-            <Picker.Item label="February 2025" value="February 2025" />
-            <Picker.Item label="January 2025" value="January 2025" />
-          </Picker>
+         
 
           {/* Spending Summary */}
-          <Text style={styles.sectionTitle}>Spending Summary ({selectedMonth})</Text>
           <View style={styles.spendingList}>
-            <SpendingItem label="Total Cash Spent" amount="$1,500.00" color="#DC3545" />
-            <SpendingItem label="Total Card Spent" amount="$3,000.00" color="#28A745" />
-            <SpendingItem label="Total Account Spent" amount="$4,500.00" color="#007AFF" />
+            <SpendingItem
+  label="Available Balance"
+  amount={`$${(allTransactions?.balance ?? 0) > 0 ? allTransactions?.balance : "0"}`}
+  color="#007AFF"
+/>
           </View>
         </View>
 
@@ -76,25 +88,98 @@ const [logout, {isSuccess, }]= useSignOutMutation()
      
 
       {/* Plan Card */}
-      <View style={styles.planCard}>
-        <Text style={styles.sectionTitle}>Active Plan</Text>
-        <Text style={styles.planTitle}>Premium Plan</Text>
-        <Text style={styles.planDetails}>Unlimited Transactions & Advanced Reports</Text>
-        <Text style={styles.planPrice}>$9.99/month</Text>
-        <TouchableOpacity style={styles.manageButton}>
-          <Text style={styles.manageText}>Manage Plan</Text>
+      {loadingPlan ? (
+  <Text>Loading...</Text>
+) : myPlan?.result?.isActive ? (
+  <>
+    <Text style={styles.planActiveTitle}>🎉 Active Plan</Text>
+    <View style={styles.planInfoBox}>
+      <Text style={styles.planName}>{myPlan.result.plan.name}</Text>
+
+      <View style={styles.planRow}>
+        <Text style={styles.planLabel}>💰 Price:</Text>
+        <Text style={styles.planValue}>₹{myPlan.result.plan.price}</Text>
+      </View>
+
+      <View style={styles.planRow}>
+        <Text style={styles.planLabel}>📅 Duration:</Text>
+        <Text style={styles.planValue}>{myPlan.result.plan.duration} Days</Text>
+      </View>
+
+      <View style={styles.planRow}>
+        <Text style={styles.planLabel}>⏳ Start:</Text>
+        <Text style={styles.planValue}>
+          {new Date(myPlan.result.startDate).toLocaleDateString()}
+        </Text>
+      </View>
+
+      <View style={styles.planRow}>
+        <Text style={styles.planLabel}>🚀 Ends:</Text>
+        <Text style={styles.planValue}>
+          {new Date(myPlan.result.endDate).toLocaleDateString()}
+        </Text>
+      </View>
+
+      <View style={styles.daysLeftBox}>
+        <Text style={styles.daysLeftText}>
+          🕐{" "}
+          {Math.max(
+            0,
+            Math.ceil(
+              (new Date(myPlan.result.endDate).getTime() - Date.now()) /
+                (1000 * 60 * 60 * 24)
+            )
+          )}{" "}
+          Days Left
+        </Text>
+      </View>
+
+      <TouchableOpacity style={styles.manageButton}>
+        <Text style={styles.manageText}>Manage Plan</Text>
+      </TouchableOpacity>
+    </View>
+  </>
+) : <></>}
+
+    <View style={styles.noPlanCard}>
+        <Text style={styles.noPlanText}>You don’t have an active plan.</Text>
+        <TouchableOpacity
+          style={styles.goToPlansButton}
+          onPress={() => router.push("/configurations/Plans")
+    }
+        >
+          <Text style={styles.goToPlansText}>🔓 View Available Plans</Text>
         </TouchableOpacity>
       </View>
-
-      {/* Settings Options */}
+    
+    
+          {/* Settings Options */}
       <View style={styles.optionsContainer}>
-        <OptionItem icon="settings-outline" label="Settings" />
-        <OptionItem icon="notifications-outline" label="Notifications" />
-        <OptionItem icon="bar-chart-outline" label="Reports" />
-        <OptionItem icon="help-circle-outline" label="Help & Support" />
-      </View>
 
-      {/* Logout Button */}
+    
+      <TouchableOpacity style={styles.optionItem} onPress={() => router.push("/configurations/Family")}>
+          <Ionicons name="people-outline" size={22} color="#007AFF" />
+          <Text style={styles.optionText}>Family</Text>
+          <MaterialIcons name="chevron-right" size={24} color="#888" />
+        </TouchableOpacity>
+    
+    
+      <TouchableOpacity style={styles.optionItem} >
+          <Ionicons name="notifications-outline" size={22} color="#007AFF" />
+          <Text style={styles.optionText}>Notifications</Text>
+          <MaterialIcons name="chevron-right" size={24} color="#888" />
+        </TouchableOpacity>
+    
+  
+      <TouchableOpacity style={styles.optionItem} >
+          <Ionicons name="help-circle-outline" size={22} color="#007AFF" />
+          <Text style={styles.optionText}>Help & Support</Text>
+          <MaterialIcons name="chevron-right" size={24} color="#888" />
+        </TouchableOpacity>
+    </View>
+
+
+
       <TouchableOpacity style={styles.logoutButton} onPress={e=>logout()}>
         <Ionicons name="log-out-outline" size={22} color="white" />
         <Text style={styles.logoutText}>Logout</Text>
@@ -104,14 +189,7 @@ const [logout, {isSuccess, }]= useSignOutMutation()
 };
 export default Account;
 
-// Reusable Option Component
-const OptionItem = ({ icon, label }:{icon:keyof typeof Ionicons.glyphMap, label:string}) => (
-  <TouchableOpacity style={styles.optionItem}>
-    <Ionicons name={icon} size={22} color="#007AFF" />
-    <Text style={styles.optionText}>{label}</Text>
-    <MaterialIcons name="chevron-right" size={24} color="#888" />
-  </TouchableOpacity>
-);
+
 
 
 
@@ -199,45 +277,80 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#DC3545",
   },
-  planCard: {
-    backgroundColor: "#007AFF",
-    padding: 20,
-    borderRadius: 15,
-    marginTop: 20,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  planTitle: {
-    fontSize: 18,
+  planActiveTitle: {
+    fontSize: 20,
     fontWeight: "bold",
-    color: "#FFF",
-  },
-  planDetails: {
-    fontSize: 14,
-    color: "#EEE",
-    textAlign: "center",
-    marginVertical: 5,
-  },
-  planPrice: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#FFF",
+    color: "#007AFF",
     marginBottom: 10,
   },
-  manageButton: {
-    backgroundColor: "#FFF",
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 10,
+  
+  planInfoBox: {
+    width: "100%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 15,
+    padding: 15,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 4,
+    elevation: 2,
   },
-  manageText: {
+  
+  planName: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#007AFF",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  
+  planRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 6,
+  },
+  
+  planLabel: {
+    fontSize: 14,
+    color: "#666",
+  },
+  
+  planValue: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#333",
+  },
+  
+  daysLeftBox: {
+    marginTop: 12,
+    backgroundColor: "#E6F0FF", // subtle blue background
+    borderRadius: 10,
+    paddingVertical: 10,
+  },
+  
+  daysLeftText: {
     color: "#007AFF",
     fontSize: 16,
     fontWeight: "bold",
+    textAlign: "center",
   },
+  
+  manageButton: {
+    backgroundColor: "#007AFF",
+    paddingVertical: 10,
+    borderRadius: 10,
+    marginTop: 15,
+  },
+  
+  manageText: {
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    fontSize: 16,
+    textAlign: "center",
+  },
+  
   optionsContainer: {
     marginTop: 30,
     backgroundColor: "#FFFFFF",
@@ -330,8 +443,40 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
+    marginBlock:15
   },
   spendingList: {
     marginTop: 10,
+  },
+  noPlanCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 15,
+    padding: 20,
+    marginTop: 15,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+    alignItems: "center",
+  },
+  
+  noPlanText: {
+    fontSize: 16,
+    color: "#555",
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  
+  goToPlansButton: {
+    backgroundColor: "#007AFF",
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  
+  goToPlansText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });

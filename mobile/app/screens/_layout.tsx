@@ -1,9 +1,10 @@
 import { Stack } from 'expo-router';
 import { Provider } from 'react-native-paper';
 import BottomNavigation from '../components/BottomTabs';
+import Toast from 'react-native-toast-message';
 
 export default function HomeLayout() {
-    return (
+    return <>
         <Stack
             screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Home" />
@@ -13,5 +14,7 @@ export default function HomeLayout() {
             {/* <Stack.Screen name="Day" /> */}
             
         </Stack>
-    );
+            <Toast />
+        
+    </>
 }

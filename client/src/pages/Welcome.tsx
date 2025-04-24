@@ -8,6 +8,8 @@ import { Button } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import { ShieldCheck, TrendingUp, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 const Welcome = () => {
   const navigate = useNavigate()
@@ -16,9 +18,14 @@ const Welcome = () => {
     { value: 1000000, label: "Transactions Managed", icon: <TrendingUp size={48} /> },
     { value: 99.9, label: "Uptime & Security", icon: <ShieldCheck size={48} /> },
   ];
-
+const {user}:any= useSelector((state:RootState)=> state.auth)
   const x = () =>{
-    navigate("/login")
+    if(user){
+      navigate("/user")
+    }else{
+      navigate("/login")
+
+    }
   }
   // Animated Counter
   const [counts, setCounts] = useState(stats.map(() => 0));

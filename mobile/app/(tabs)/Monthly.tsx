@@ -53,11 +53,14 @@ const groupTransactionsByMonth = (transactions: ITransaction[]): MonthlySummary[
 
 const Monthly = () => {
   const { data, refetch } = useGetAllTransactionsQuery();
-  const transactions: ITransaction[] = data?.result?.map((tx) => ({
+  const transactions: ITransaction[] = data?.result
+  ?.filter((tx) => !tx.isTransfered) // 💥 Exclude transfers
+  .map((tx) => ({
     ...tx,
     _id: tx._id || crypto.randomUUID(),
     type: tx.type === "income" || tx.type === "expense" ? tx.type : "expense",
   })) || [];
+
 
   const monthlyData = groupTransactionsByMonth(transactions);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);

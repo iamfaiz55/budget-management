@@ -8,10 +8,21 @@ interface ProtectProps {
 }
 
 const Protect: React.FC<ProtectProps> = ({ compo }) => {
-  const {user} = useSelector((state: RootState) => state.auth);
-console.log("userrrr", user);
+  const {user} :any= useSelector((state: RootState) => state.auth);
+// console.log("userrrr", user);
 
   return user ? <>{compo}</> : <Navigate to="/login" />;
 };
+
+export const AdminProtect: React.FC<ProtectProps> = ({ compo }) => {
+  const {user} :any= useSelector((state: RootState) => state.auth);
+// console.log("userrrr", user);
+
+  return user && user.role === "admin" ? <>{compo}</> : <Navigate to="/login" />;
+};
+
+
+
+
 
 export default Protect;

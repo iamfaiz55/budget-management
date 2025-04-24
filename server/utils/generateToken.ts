@@ -11,7 +11,7 @@ export const generateToken = (payload: Object) => {
         throw new Error("JWT_KEY must be defined")
     }
 
-    return jwt.sign(payload, secretKey, { expiresIn: "1d" })
+    return jwt.sign(payload, secretKey, { expiresIn: "30d" })
 }
 
 export const generateResetToken = (payload: Object) => {

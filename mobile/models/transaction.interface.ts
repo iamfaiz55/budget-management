@@ -1,3 +1,5 @@
+import { IUser } from "./user.interface";
+
 export interface ITransaction {
     _id?: string;
     date: string;
@@ -6,6 +8,14 @@ export interface ITransaction {
     amount:number;
     account: string
     type:string;
+    isTransfered:boolean;
     // status: 'active' | 'inactive';
-    user?:string
+    user?:IUser
+}
+
+export interface ICategory {
+    _id: string;
+    name: string;
+    type?: "expense"| "income";
+    createdBy?: string 
 }
