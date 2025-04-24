@@ -4,14 +4,16 @@ import { motion } from "framer-motion";
 import { FaMoneyBillWave, FaChartLine, FaShieldAlt, FaUserShield, FaWallet, FaChartPie, FaUniversity, FaTags, FaLock } from "react-icons/fa";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // Import styles for Carousel
-import { Button } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import { ShieldCheck, TrendingUp, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
+import { useGetAllPlansQuery } from "../redux/planApi";
 
 const Welcome = () => {
+    const { data } = useGetAllPlansQuery();
+  
   const navigate = useNavigate()
   const stats = [
     { value: 500000, label: "Users Trusting Us", icon: <User size={48} /> },
@@ -112,7 +114,7 @@ const {user}:any= useSelector((state:RootState)=> state.auth)
 
       {/* Benefits Section */}
       <section className="py-20 container mx-auto text-center bg-white">
-        <h2 className="text-4xl font-semibold mb-10">Why Use BudgetMaster?</h2>
+        <h2 className="text-4xl font-semibold mb-10 ">Why Use BudgetMaster?</h2>
         <div className="grid md:grid-cols-4 gap-8">
           {[
             { icon: FaMoneyBillWave, title: "Track Expenses", desc: "Monitor your daily spending easily." },
@@ -144,37 +146,62 @@ const {user}:any= useSelector((state:RootState)=> state.auth)
       Discover the tools that help you take control of your finances with ease and efficiency.
     </p>
 
-    <div className="relative max-w-3xl mx-auto">
-      <Carousel 
-        showArrows={true} 
-        autoPlay 
-        infiniteLoop 
-        interval={4000} 
-        transitionTime={1000}
+    <div className="relative max-w-4xl mx-auto">
+      <Carousel
+        showArrows={true}
+        autoPlay
+        infiniteLoop
+        interval={5000}
+        transitionTime={1200}
         showThumbs={false}
         showStatus={false}
-        className="rounded-lg shadow-xl overflow-hidden"
+        className="rounded-xl shadow-2xl overflow-hidden"
       >
         {[
-          { img: "https://www.collidu.com/media/catalog/product/img/1/3/13c094ff0e6617b88893666970b0cf2db18076f3f7654bb10c6dcb8b40683df1/budget-management-slide1.png", title: "Smart Budgeting", desc: "Easily set and track your budgets for better financial control." },
-          { img: "https://www.researchgate.net/publication/369379322/figure/fig1/AS:11431281207659479@1701312684430/Features-of-financial-management.png", title: "Analytics & Insights", desc: "Visualize your spending with powerful analytics and reports." },
-          { img: "https://www.cflowapps.com/wp-content/uploads/2021/11/budgt_mngmnt.jpg", title: "Expense Tracking", desc: "Monitor every transaction and stay on top of your finances." },
+          { 
+            img: "https://www.collidu.com/media/catalog/product/img/1/3/13c094ff0e6617b88893666970b0cf2db18076f3f7654bb10c6dcb8b40683df1/budget-management-slide1.png", 
+            title: "Smart Budgeting", 
+            desc: "Easily set and track your budgets for better financial control.", 
+            cta: "Start Budgeting"
+          },
+          { 
+            img: "https://www.researchgate.net/publication/369379322/figure/fig1/AS:11431281207659479@1701312684430/Features-of-financial-management.png", 
+            title: "Analytics & Insights", 
+            desc: "Visualize your spending with powerful analytics and reports.", 
+            cta: "See Your Insights"
+          },
+          { 
+            img: "https://www.cflowapps.com/wp-content/uploads/2021/11/budgt_mngmnt.jpg", 
+            title: "Expense Tracking", 
+            desc: "Monitor every transaction and stay on top of your finances.", 
+            cta: "Track Expenses"
+          },
         ].map((slide, index) => (
-          <motion.div 
-            key={index} 
-            className="relative flex flex-col items-center justify-center p-4 bg-white rounded-lg shadow-lg"
-            initial={{ opacity: 0.8, scale: 0.95 }} 
-            animate={{ opacity: 1, scale: 1 }} 
-            transition={{ duration: 0.8 }}
+          <motion.div
+            key={index}
+            className="relative flex flex-col items-center justify-center p-6 bg-white rounded-3xl shadow-2xl"
+            initial={{ opacity: 0.7, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: index * 0.3 }}
           >
-            <img 
-              src={slide.img} 
-              alt={`Feature ${index + 1}`} 
-              className="rounded-lg object-cover w-80 h-60 md:w-96 md:h-72"
+            <img
+              src={slide.img}
+              alt={`Feature ${index + 1}`}
+              className="rounded-xl object-cover w-full h-60 md:h-72"
             />
-            <div className="text-center mt-4">
-              <h3 className="text-xl font-semibold text-indigo-700">{slide.title}</h3>
-              <p className="text-gray-600 text-sm">{slide.desc}</p>
+            <div className="absolute top-4 left-4 bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
+              Featured
+            </div>
+            <div className="text-center mt-6">
+              <h3 className="text-2xl font-semibold text-indigo-700">{slide.title}</h3>
+              <p className="text-gray-600 text-base mb-4">{slide.desc}</p>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-indigo-600 text-white px-6 py-3 rounded-full font-semibold shadow-md hover:bg-indigo-700 transition"
+              >
+                {slide.cta}
+              </motion.button>
             </div>
           </motion.div>
         ))}
@@ -183,6 +210,7 @@ const {user}:any= useSelector((state:RootState)=> state.auth)
 
   </div>
 </section>
+
 
 
 
@@ -243,7 +271,7 @@ const {user}:any= useSelector((state:RootState)=> state.auth)
   </div>
 
   {/* Stats Section */}
-  <div className="relative bg-indigo-700 text-white py-12">
+  <div className="relative bg-indigo-700 text-white mt-10 py-10">
       {/* Wave Background */}
       <svg className="absolute top-0 left-0 w-full h-12" viewBox="0 0 1440 160" fill="none">
         <path fill="#4F46E5" d="M0,32L1440,96L1440,160L0,160Z"></path>
@@ -275,6 +303,10 @@ const {user}:any= useSelector((state:RootState)=> state.auth)
     </div>
 </section>
 
+
+
+
+
 {/* Pricing Plans */}
 <section className="py-20 bg-gray-100">
   <div className="container mx-auto text-center">
@@ -286,61 +318,86 @@ const {user}:any= useSelector((state:RootState)=> state.auth)
       Whether you're just getting started or need advanced features, we have a plan that fits your needs.
     </p>
 
-    <div className="grid md:grid-cols-3 gap-8">
-      {[
-        { 
-          name: "Free", 
-          price: "$0", 
-          features: ["Basic Expense Tracking", "Monthly Reports", "Community Support"], 
-          highlight: false 
-        },
-        { 
-          name: "Pro", 
-          price: "$9.99/mo", 
-          features: ["Unlimited Categories", "Advanced Analytics", "Priority Support"], 
-          highlight: true 
-        },
-        { 
-          name: "Enterprise", 
-          price: "$29.99/mo", 
-          features: ["Multi-User Access", "Custom Reports", "Dedicated Support"], 
-          highlight: false 
-        }
-      ].map((plan, index) => (
-        <motion.div 
-          key={index} 
-          className={`p-8 rounded-lg shadow-lg border ${plan.highlight ? "bg-indigo-600 text-white" : "bg-white"}`}
-          whileHover={{ scale: 1.05 }}
-        >
-          <h3 className={`text-2xl font-semibold mb-4 ${plan.highlight ? "text-white" : "text-indigo-700"}`}>
-            {plan.name} Plan
-          </h3>
-          <p className={`text-4xl font-bold mb-6 ${plan.highlight ? "text-white" : "text-gray-800"}`}>
-            {plan.price}
-          </p>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-7xl mx-auto">
+      {data &&
+        data.result.map((plan, index) => (
+          <motion.div
+            key={plan._id}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: index * 0.2 }}
+            className="p-6 bg-white border rounded-2xl shadow-xl text-center hover:shadow-2xl transition-transform transform hover:scale-105"
+          >
+            <h3 className="text-2xl font-semibold text-blue-600 mb-4">{plan.name}</h3>
 
-          <ul className="mb-6 space-y-3 text-sm">
-            {plan.features.map((feature, i) => (
-              <li key={i} className="flex items-center justify-center gap-2">
-                ✅ <span>{feature}</span>
-              </li>
-            ))}
-          </ul>
+            {/* Pricing & Plan Details */}
+            <div className="flex flex-wrap justify-center gap-4 mt-4 text-gray-700">
+              <p className="bg-gray-200 px-3 py-1 rounded-lg font-bold text-sm">💰 ${plan.price}</p>
+              <p className="bg-gray-200 px-3 py-1 rounded-lg font-bold text-sm">👥 {plan.maxUsers} Users</p>
+              <p className="bg-gray-200 px-3 py-1 rounded-lg font-bold text-sm">📅 {plan.duration} Days</p>
+            </div>
 
-          <Button className={`px-6 py-3 font-bold rounded-lg transition ${plan.highlight ? "bg-white text-indigo-600 hover:bg-gray-200" : "bg-indigo-600 text-white hover:bg-indigo-700"}`}>
-            Get Started
-          </Button>
-        </motion.div>
-      ))}
+            {/* Button to get the plan */}
+            <div className="mt-6">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-indigo-600 text-white px-8 py-3 rounded-full font-semibold shadow-md hover:bg-indigo-700 transition"
+              >
+                Get Started
+              </motion.button>
+            </div>
+          </motion.div>
+        ))}
     </div>
   </div>
 </section>
 
 
-      {/* Footer */}
-      <footer className="py-10 bg-gray-900 text-white text-center">
-        <p>&copy; {new Date().getFullYear()} BudgetMaster. All rights reserved.</p>
-      </footer>
+<footer className="py-16 bg-gray-900 text-white text-center">
+  <div className="container mx-auto">
+    {/* Footer Content */}
+    <div className="space-y-4">
+      {/* Copyright Information */}
+      <p className="text-sm">
+        &copy; {new Date().getFullYear()} BudgetMaster. All rights reserved.
+      </p>
+
+      {/* Developer and Maintainer Information */}
+      <p className="text-sm">
+        Developed by <span className="font-semibold text-indigo-400">Shaikh Faiz</span>
+      </p>
+      <p className="text-sm">
+        Maintained by <span className="font-semibold text-indigo-400">Matic UI</span>
+      </p>
+      
+      {/* Social Links */}
+      <div className="flex justify-center gap-6 mt-6">
+        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-indigo-400 transition-colors">
+          <i className="fab fa-twitter text-2xl"></i>
+        </a>
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-indigo-400 transition-colors">
+          <i className="fab fa-github text-2xl"></i>
+        </a>
+        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-indigo-400 transition-colors">
+          <i className="fab fa-linkedin text-2xl"></i>
+        </a>
+      </div>
+
+      {/* Terms and Privacy */}
+      <div className="text-sm text-white/70 mt-6">
+        <a href="/terms" className="hover:text-indigo-400 mx-2">Terms of Service</a> | 
+        <a href="/privacy" className="hover:text-indigo-400 mx-2">Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+  
+  {/* Footer Bottom Wave */}
+  <svg className="bottom-0 left-0 w-full h-12" viewBox="0 0 1440 160" fill="none">
+    <path fill="#4F46E5" d="M0,96L1440,32L1440,160L0,160Z"></path>
+  </svg>
+</footer>
+
     </div>
   );
 };
