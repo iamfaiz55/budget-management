@@ -5,7 +5,8 @@ import { ICategory } from "../models/transaction.interface";
 
 // Custom base query with auth
 const baseQuery = fetchBaseQuery({
-    baseUrl: "http://localhost:5000/api/v1/category",
+    // baseUrl: "http://localhost:5000/api/v1/category",
+    baseUrl: `${import.meta.env.VITE_BACKEND_URL}/api/v1/category`,
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
         const state = getState() as RootState;

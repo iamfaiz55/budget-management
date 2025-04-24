@@ -5,7 +5,8 @@ import { RootState } from "./store";
 import { IUser } from "../models/user.interface";
 
 const baseQuery = fetchBaseQuery({
-    baseUrl: "http://localhost:5000/api/v1/auth",
+    // baseUrl: "http://localhost:5000/api/v1/auth",
+    baseUrl: `${import.meta.env.VITE_BACKEND_URL}/api/v1/auth`,
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
         const token = (getState() as RootState).auth?.token || ""; 

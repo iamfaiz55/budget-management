@@ -4,7 +4,8 @@ import { IMyPlan, IPayment, IPaymentCreate, ISubscription } from "../models/subs
 // import { IPlan } from "../models/plan.interface";
 
 const baseQuery = fetchBaseQuery({
-    baseUrl: "http://localhost:5000/api/v1/subscriptions",
+    // baseUrl: "http://localhost:5000/api/v1/subscriptions",
+    baseUrl: `${import.meta.env.VITE_BACKEND_URL}/api/v1/subscriptions`,
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
         const state = getState() as RootState;

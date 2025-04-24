@@ -4,7 +4,8 @@ import { RootState } from "./store";
 
 // Custom base query to fetch token from Redux store
 const baseQuery = fetchBaseQuery({
-    baseUrl: "http://localhost:5000/api/v1/transaction",
+    // baseUrl: "http://localhost:5000/api/v1/transaction",
+    baseUrl: `${import.meta.env.VITE_BACKEND_URL}/api/v1/transaction`,
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
         const state = getState() as RootState;
