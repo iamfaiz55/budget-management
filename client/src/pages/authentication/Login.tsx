@@ -5,7 +5,6 @@ import { FaUser, FaKey } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useGoogleLoginMutation, useSignInMutation, useVerifyOtpMutation } from "../../redux/authApi";
 import { GoogleLogin } from '@react-oauth/google';
-import { jwtDecode } from 'jwt-decode';
 
 interface OTPLoginFormInputs {
   username: string;

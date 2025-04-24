@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { useGetAllTransactionsQuery } from "../../redux/transactionApi";
 import { useAddPersonMutation, useGetMyPlanQuery } from "../../redux/subscriptionApi";
 import { useGetAllUsersQuery } from "../../redux/userApi";
-import { IUser } from "../../models/user.interface";
 import { useUserData } from "../../contexts/userDetailsContext";
 import { useNavigate } from "react-router-dom";
 

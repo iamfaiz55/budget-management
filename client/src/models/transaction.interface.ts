@@ -11,7 +11,7 @@ export interface ITransaction {
     isTransfered?:boolean;
     // status: 'active' | 'inactive';
     user?:IUser
-
+    createdAt?:string
 }
 
 

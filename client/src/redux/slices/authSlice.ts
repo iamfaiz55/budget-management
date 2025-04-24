@@ -55,7 +55,7 @@ const authSlice = createSlice({
         openSessionExpiredModal: (state) => {
             state.sessionExpiredOpen = true;
         },
-        addDataFor: (state, payload) => {
+        addDataFor: (state) => {
             state.sessionExpiredOpen = false;
         },
     },

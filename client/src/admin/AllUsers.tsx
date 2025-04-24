@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { useGetAllUsersQuery } from "../redux/userApi";
 import { IUser } from "../models/user.interface";
 
@@ -9,7 +9,7 @@ const AllUsers = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data, isLoading, isError, refetch } = useGetAllUsersQuery({
+  const { data, refetch } = useGetAllUsersQuery({
     searchQuery,
     isFetchAll: false,
     page,
@@ -17,7 +17,7 @@ const AllUsers = () => {
   });
   
   const totalPages = data?.totalPages ?? 1;  // Safe fallback to 1
-  const totalUsers = data?.totalUsers ?? 0;  // Safe fallback to 0
+  // const totalUsers = data?.totalUsers ?? 0;  // Safe fallback to 0
   
 
   const handleOpenDialog = (user: IUser) => {
