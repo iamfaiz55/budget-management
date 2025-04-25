@@ -1,5 +1,4 @@
 // import React from "react";
-import Mobile from "./../../public/stats.png";
 import { motion } from "framer-motion";
 import { FaMoneyBillWave, FaChartLine, FaShieldAlt, FaUserShield, FaWallet, FaChartPie, FaUniversity, FaTags, FaLock } from "react-icons/fa";
 import { Carousel } from "react-responsive-carousel";
@@ -135,8 +134,8 @@ const {user}:any= useSelector((state:RootState)=> state.auth)
       </section>
 
 {/* Carousel Section */}
-<section className="py-10 bg-white">
-  <div className="container mx-auto text-center px-4">
+<section className="py-0 bg-white">
+  <div className="container mx-auto text-center  ">
     <h2 className="text-4xl font-semibold mb-6 text-indigo-700">
       Explore Our Powerful Features
     </h2>
@@ -144,7 +143,7 @@ const {user}:any= useSelector((state:RootState)=> state.auth)
       Discover the tools that help you take control of your finances with ease and efficiency.
     </p>
 
-    <div className="relative w-full max-w-full mx-auto">
+    <div className="relative w-full max-w-full mx-auto ">
       <Carousel
         showArrows={true}
         autoPlay
@@ -154,24 +153,7 @@ const {user}:any= useSelector((state:RootState)=> state.auth)
         showThumbs={false}
         showStatus={false}
         className="rounded-xl shadow-2xl overflow-hidden"
-        renderArrowPrev={(onClickHandler, hasPrev, label) => (
-          <button
-            onClick={onClickHandler}
-            title={label}
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-indigo-600 text-white p-2 rounded-full opacity-70 hover:opacity-100 transition"
-          >
-            &lt;
-          </button>
-        )}
-        renderArrowNext={(onClickHandler, hasNext, label) => (
-          <button
-            onClick={onClickHandler}
-            title={label}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-indigo-600 text-white p-2 rounded-full opacity-70 hover:opacity-100 transition"
-          >
-            &gt;
-          </button>
-        )}
+     
       >
         {[ 
           { 
