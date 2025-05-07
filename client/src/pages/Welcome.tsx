@@ -264,7 +264,7 @@ const {user}:any= useSelector((state:RootState)=> state.auth)
         Download the latest APK to start exploring the features. Coming soon on the Play Store!
       </p>
       <a
-        href="https://expo.dev/accounts/iamfaiz55/projects/mobile/builds/82102de1-f526-405d-afa8-5b88dd2bc273"
+        href="https://expo.dev/artifacts/eas/h4woGCN276KobrmFNDLMSt.apk"
         target="_blank"
         rel="noopener noreferrer"
         className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-full shadow-md transition"
