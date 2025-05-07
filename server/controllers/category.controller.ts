@@ -71,7 +71,7 @@ export const addCategory = asyncHandler(async (req: Request, res: Response) => {
     type,
     createdBy: user?.role === "admin" ? null : user?._id,
   });
-  await invalidateCache("/api/v1/category/get-categories")
+  await invalidateCache("/api/v1/category/")
 // console.log("created category", category);
 
   res.status(201).json({ message: "Category added successfully", category });
