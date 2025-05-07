@@ -4,6 +4,8 @@ import { customValidator, validationRulesSchema } from "../utils/validator"
 import { Transactions } from "../models/Transaction"
 import { Subscription } from "../models/Subscription"
 import { User } from "../models/User"
+import redisClient from "../services/redisClient"
+import { invalidateCache } from "../utils/redisMiddleware"
 
 
 const transactionRules: validationRulesSchema = {
@@ -60,6 +62,7 @@ export const addTransaction = asyncHandler(async (req: Request, res: Response): 
   // console.log("transaction user saved ;",user.balance );
 
   await user.save();
+  await invalidateCache("/api/v1/transaction/get-transactions")
 
   res.status(200).json({ message: "Transaction Added Success" });
 });
@@ -82,6 +85,8 @@ export const getAllTransactions = asyncHandler(async (req: Request, res: Respons
         const transactions = await Transactions.find({ user: { $in: userIds } }).populate("user");
         const user = await User.findById(loggedUser.userId);
         const balance = user?.balance || 0;
+          redisClient.setex(req.originalUrl, 3600, JSON.stringify({ message: "Transaction Fetch success From Redis", result:transactions, balance }))
+        
         res.status(200).json({
             message: "Transaction Fetch Success",
            result: transactions,
@@ -130,6 +135,8 @@ export const transactionsByDate = asyncHandler(async (req: Request, res: Respons
     })
     .sort({ createdAt: -1 })
     .populate("user");
+  
+    await invalidateCache("/api/v1/transaction/get-transactions")
 
     return res.status(200).json({ message: "Transaction Fetch Success", result });
 });
@@ -201,7 +208,8 @@ export const addAmountToMember = asyncHandler(async (req: Request, res: Response
   
       await admin.save();
       await member.save();
-  
+      await invalidateCache("/api/v1/transaction/get-transactions")
+
       return res.status(200).json({
         message: "Amount transferred successfully",
         result: {

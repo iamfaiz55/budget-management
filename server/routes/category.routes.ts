@@ -7,12 +7,12 @@ import multerMiddleware from "../utils/upload";
 const categoryRoutes = express.Router();
 
 categoryRoutes
-    .get("/", protectedRoute, categoryController.getCategories)
+    .get("/get-categories", protectedRoute, categoryController.getCategories)
 
-    .post("/", protectedRoute, categoryController.addCategory)
+    .post("/add-category", protectedRoute, categoryController.addCategory)
 
-    .put("/:id", protectedRoute, categoryController.updateCategory)
+    .put("/category/:id", protectedRoute, categoryController.updateCategory)
 
-    .delete("/:id", protectedRoute, categoryController.deleteCategory);
+    .delete("/category/:id", protectedRoute, categoryController.deleteCategory);
 
 export default categoryRoutes;

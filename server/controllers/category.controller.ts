@@ -5,6 +5,8 @@ import { IUserProtected } from "../utils/protected"; // User interface with role
 // import { Category } from "../models/Plans";
 import { User } from "../models/User";
 import { Category } from "../models/Categories";
+import { invalidateCache } from "../utils/redisMiddleware";
+import redisClient from "../services/redisClient";
 
 // ✅ GET: Fetch categories (admin + personal)
 export const getCategories = asyncHandler(async (req: Request, res: Response) => {
@@ -16,8 +18,9 @@ export const getCategories = asyncHandler(async (req: Request, res: Response) =>
       { createdBy: user.userId }, // User's own categories
     ],
   }).lean();
+  redisClient.setex(req.originalUrl, 3600, JSON.stringify({ message: "Categories fetched successfully From Redis", result:categories }))
 
-  console.log("user categories", categories);
+  // console.log("user categories", categories);
   
 
   res.status(200).json({ message: "Categories fetched successfully",result:  categories });
@@ -47,7 +50,8 @@ export const addCategory = asyncHandler(async (req: Request, res: Response) => {
     type,
     createdBy: user?.role === "admin" ? null : user?._id,
   });
-console.log("created category", category);
+  await invalidateCache("/api/v1/category/get-categories")
+// console.log("created category", category);
 
   res.status(201).json({ message: "Category added successfully", category });
 });
@@ -76,6 +80,7 @@ export const updateCategory = asyncHandler(async (req: Request, res: Response) =
   category.name = name || category.name;
   category.type = type || category.type;
   await category.save();
+  await invalidateCache("/api/v1/category/get-categories")
 
   res.status(200).json({ message: "Category updated successfully", category });
 });
@@ -101,5 +106,7 @@ export const deleteCategory = asyncHandler(async (req: Request, res: Response) =
   }
 
   await category.deleteOne();
+  await invalidateCache("/api/v1/category/get-categories")
+
   res.status(200).json({ message: "Category deleted successfully" });
 });
