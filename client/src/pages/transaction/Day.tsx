@@ -3,14 +3,14 @@ import { useGetAllTransactionsQuery } from "../../redux/transactionApi";
 import { ITransaction } from "../../models/transaction.interface";
 import { FaPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-// import { ITransaction } from "../../types"; // Ensure correct import
+// import { ITransaction } from "../../types"; 
 
 const Day = () => {
   const navigate = useNavigate()
   const { data } = useGetAllTransactionsQuery();
   // console.log("data :", data);
   
-  const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split("T")[0]; 
 
   // Filter today's transactions safely
   const todayTransactions = data?.result?.filter((transaction: ITransaction) =>

@@ -256,8 +256,25 @@ const {user}:any= useSelector((state:RootState)=> state.auth)
         </div>
       ))}
     </div>
+
+    {/* App Download Section */}
+    <div className="mt-16">
+      <h3 className="text-2xl font-semibold text-indigo-700 mb-4">Try the App Now</h3>
+      <p className="text-gray-600 mb-6 max-w-xl mx-auto">
+        Download the latest APK to start exploring the features. Coming soon on the Play Store!
+      </p>
+      <a
+        href="https://expo.dev/accounts/iamfaiz55/projects/mobile/builds/82102de1-f526-405d-afa8-5b88dd2bc273"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-full shadow-md transition"
+      >
+        Download APK
+      </a>
+    </div>
   </div>
 </section>
+
 
 
 

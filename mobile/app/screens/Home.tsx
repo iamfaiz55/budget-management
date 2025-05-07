@@ -11,6 +11,7 @@ import { View } from "react-native";
 import Toast from 'react-native-toast-message';
 import { useGetAllTransactionsQuery } from "@/redux/transactionApi";
 import { useSignOutMutation } from "@/redux/authApi";
+import NetworkStatus from "../components/NetworkStatusNotifier";
 
 
 
@@ -78,6 +79,7 @@ const HomeScreen = () => {
   };
 
   return <>
+  <NetworkStatus />
     <BottomNavigation
       navigationState={{ index, routes }}
       onIndexChange={setIndex}

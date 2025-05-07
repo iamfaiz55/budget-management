@@ -6,12 +6,12 @@ import { useRouter } from "expo-router";
 import { useGoogleLoginMutation, useSignInMutation, useVerifyOTPMutation } from "@/redux/authApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import GoogleLoginButton from "../components/GoogleButton";
-import { GoogleSignin, isSuccessResponse, statusCodes, User } from '@react-native-google-signin/google-signin';
+import { GoogleSignin, isSuccessResponse, statusCodes } from '@react-native-google-signin/google-signin';
 
 const OTPLogin = () => {
   const router = useRouter();
   const fadeAnim = useState(new Animated.Value(0))[0];
-const [signInWithGoogle, {isSuccess, data:googleLoginData}]= useGoogleLoginMutation()
+const [signInWithGoogle, {isSuccess, data:googleLoginData, error:googleLoginError}]= useGoogleLoginMutation()
   const [username, setUsername] = useState("");
   const [otp, setOtp] = useState("");
   const [showOTPField, setShowOTPField] = useState(false);
@@ -19,27 +19,62 @@ const [signInWithGoogle, {isSuccess, data:googleLoginData}]= useGoogleLoginMutat
   const [sendOTP, { isSuccess: otpSent, isLoading: otpLoading, isError: sendError, error }] = useSignInMutation();
   const [verifyOTP, { isSuccess: verified, data: verifyData, isLoading: verifying , data}] = useVerifyOTPMutation();
 
-  const handleGoogleSignIn = async () => {
-    try {
-        await GoogleSignin.hasPlayServices()
-        await GoogleSignin.signOut();
+//   const handleGoogleSignIn = async () => {
+//     try {
+      
+//       await GoogleSignin.hasPlayServices();
+//       await GoogleSignin.signOut();
+      
+//       console.log("clicked");
+//       const response = await GoogleSignin.signIn()
+//         console.log("response :", response);
+        
+//         if (isSuccessResponse(response)) {
+//             const { idToken } = response.data
 
-        const response = await GoogleSignin.signIn()
-        if (isSuccessResponse(response)) {
-            const { idToken } = response.data
+//             if (idToken) {
+//                  signInWithGoogle({ idToken })
+//                 // if (data?.result) {
+//                 //     dispatch(setUser(data.result))
+//                 // }
+//             }
+//         }
+//     } catch (error) {
+//         console.log(error);
 
-            if (idToken) {
-                await signInWithGoogle({ idToken })
-                // if (data?.result) {
-                //     dispatch(setUser(data.result))
-                // }
-            }
-        }
-    } catch (error) {
-        console.log(error);
+//         }
+//     }
 
-        }
-    }
+const handleGoogleSignIn = async () => {
+  try {
+    await GoogleSignin.hasPlayServices();
+    const userInfo = await GoogleSignin.signIn();
+
+    const idToken = userInfo?.data?.idToken;
+
+    if (!idToken) {
+      console.error("Google ID token is missing.");
+      return;
+    }
+
+    const response = await signInWithGoogle({ idToken }); 
+
+    if ('data' in response && response.data?.result?.token) {
+      await AsyncStorage.setItem("authToken", response.data.result.token);
+      await AsyncStorage.setItem("user", JSON.stringify(response.data.result));
+      router.replace("/");
+    } else {
+      console.error("Login failed:", response);
+      Alert.alert("Login Failed", "Invalid login response from server.");
+    }
+  } catch (error: any) {
+    console.log("Google Sign-In error", error);
+    Alert.alert("Error", "Google Sign-In failed. Please try again.");
+  }
+};
+
+
+
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -131,14 +166,40 @@ useEffect(() => {
   }, [verified]);
 
 
-  useEffect(() => {
-    GoogleSignin.configure({
-      // 482424704215-hsgq2olvh5pf12pdkvdu0p8n9n4k376s.apps.googleusercontent.com
-      // iosClientId: "195321382919-59fvu1pkgvlr27mtdepi4adqu0n28coo.apps.googleusercontent.com",
-      webClientId: "482424704215-55mudkvidkp7e60r3seuefi1uqkgeffp.apps.googleusercontent.com",
-      profileImageSize: 150
-    })
-  }, [])
+//   useEffect(() => {
+//    const x = GoogleSignin.configure({
+//       // 482424704215-hsgq2olvh5pf12pdkvdu0p8n9n4k376s.apps.googleusercontent.com
+//       // iosClientId: "195321382919-59fvu1pkgvlr27mtdepi4adqu0n28coo.apps.googleusercontent.com",
+//       // webClientId: "482424704215-55mudkvidkp7e60r3seuefi1uqkgeffp.apps.googleusercontent.com",
+//       webClientId: "482424704215-55mudkvidkp7e60r3seuefi1uqkgeffp.apps.googleusercontent.com",
+//       profileImageSize: 150
+//     })
+
+  
+// // console.log("xxxxxx", x);
+
+//   }, [])
+const x = ()=>{
+  GoogleSignin.configure({
+    // webClientId: "482424704215-55mudkvidkp7e60r3seuefi1uqkgeffp.apps.googleusercontent.com",  // your WEB CLIENT ID
+    webClientId: "482424704215-tnarkjbnna792g80rrtjs24c9paiuijr.apps.googleusercontent.com",  // your WEB CLIENT ID
+    offlineAccess: true,
+    scopes: ['profile', 'email'],
+    forceCodeForRefreshToken: true,
+  });
+}
+useEffect(() => {
+  
+    x()
+  // console.log("calledddd", x);
+}, []);
+
+useEffect(() => {
+  if (googleLoginError) {
+    console.log("Google login error", googleLoginError);
+    Alert.alert("Login Error", JSON.stringify(googleLoginError));
+  }
+}, [googleLoginError]);
 
 
   return (

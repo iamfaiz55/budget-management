@@ -33,7 +33,9 @@ import About from "./pages/user/configuration/About";
 
 const App = () => {
   return (
-    <GoogleOAuthProvider clientId="482424704215-55mudkvidkp7e60r3seuefi1uqkgeffp.apps.googleusercontent.com">
+    
+    // <GoogleOAuthProvider clientId="482424704215-55mudkvidkp7e60r3seuefi1uqkgeffp.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId="482424704215-tnarkjbnna792g80rrtjs24c9paiuijr.apps.googleusercontent.com">
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Welcome />} />

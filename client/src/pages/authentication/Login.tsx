@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import { FaUser, FaKey } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useGoogleLoginMutation, useSignInMutation, useVerifyOtpMutation } from "../../redux/authApi";
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin } from "@react-oauth/google";
+// import { GoogleLogin } from '@react-oauth/google';
 
 interface OTPLoginFormInputs {
   username: string;
@@ -12,14 +13,14 @@ interface OTPLoginFormInputs {
 }
 
 const Login: React.FC = () => {
-  const [googleLogin, {isSuccess:googleSuccess}]= useGoogleLoginMutation()
+  const [googleLogin2, {isSuccess:googleSuccess}]= useGoogleLoginMutation()
   const navigate = useNavigate();
   const [sendOTP, { isSuccess: otpSent, isError, error }] = useSignInMutation();
   const [verifyOTP, { isSuccess: verified, data: verifyData }] = useVerifyOtpMutation();
   const handleGoogleSuccess = (credentialResponse: any) => {
     if (credentialResponse.credential) {
-      // console.log("Google User Info:",credentialResponse.credential);
-      googleLogin({idToken:credentialResponse.credential})
+      console.log("Google User Info:",credentialResponse.credential);
+      googleLogin2({idToken:credentialResponse.credential})
       // Example: Navigate based on email or role
       // if (decoded.email === 'admin@example.com') navigate('/admin');
       // else navigate('/user');

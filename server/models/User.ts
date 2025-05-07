@@ -7,6 +7,7 @@ export interface IUser extends Document {
     mobile: string
     profile: string
     balance: number
+  
     role: 'admin' | 'user';
     myCurrency?: mongoose.Schema.Types.ObjectId;
     status: 'active' | 'inactive';
@@ -26,6 +27,7 @@ const userSchema = new Schema<IUser>({
     profile: { type: String},
     email: { type: String, required: true},
     balance: { type:Number},
+
     myCurrency:{type:mongoose.Schema.ObjectId, ref:"Currency"},
     role: {
         type: String,

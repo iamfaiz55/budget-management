@@ -40,19 +40,20 @@ const Navbar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (open: bool
         )}
 
         {[
-          { name: "Day", path: "/user", icon: <FaClipboardList /> },
-          { name: "Calendar", path: "/user/calendar", icon: <FaCalendarAlt /> },
-          { name: "Month", path: "/user/month", icon: <FaLayerGroup /> },
-          { name: "Total", path: "/user/total", icon: <FaChartPie /> },
-          { name: "Statistics", path: "/user/stats", icon: <FaChartPie /> },
-          { name: "Account", path: "/user/account", icon: <FaUser /> },
-          { name: "Family", path: "/user/family", icon: <FaUser /> },
-          { name: "More", path: "/user/more", icon: <FaUser /> },
+          { id: "navDay",name: "Day", path: "/user", icon: <FaClipboardList /> },
+          { id: "navCalendar",name: "Calendar", path: "/user/calendar", icon: <FaCalendarAlt /> },
+          { id: "navMonth",name: "Month", path: "/user/month", icon: <FaLayerGroup /> },
+          { id: "navTotal",name: "Total", path: "/user/total", icon: <FaChartPie /> },
+          { id: "navStatistics",name: "Statistics", path: "/user/stats", icon: <FaChartPie /> },
+          { id: "navAccount",name: "Account", path: "/user/account", icon: <FaUser /> },
+          {id: "navFamily", name: "Family", path: "/user/family", icon: <FaUser /> },
+          { id: "navMore",name: "More", path: "/user/more", icon: <FaUser /> },
         ].map((link) => (
           <NavLink
             key={link.name}
             to={link.path}
             end={link.path === "/user"}
+            id={link.id} // 👈 add id here
             className={({ isActive }) =>
               `flex items-center space-x-3 py-4 px-4 rounded-lg transition duration-300 text-gray-700 hover:bg-indigo-500 hover:text-white ${
                 isActive ? "bg-indigo-600 text-white shadow-md" : ""

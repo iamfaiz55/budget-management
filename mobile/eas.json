@@ -1,14 +1,17 @@
 {
   "cli": {
-    "version": ">= 16.2.1",
+    "version": ">= 3.0.0", 
     "appVersionSource": "remote"
   },
   "build": {
     "development": {
-      "developmentClient": false,
+      "developmentClient": true,
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_BACKEND_URL": "http://192.168.204.208:5000"  
       }
     },
     "preview": {
@@ -18,7 +21,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_BACKEND_URL": "https://spendilytics-server-i429.vercel.app"
+        "EXPO_PUBLIC_BACKEND_URL": "https://spendilytics-server.vercel.app"
       }
     },
     "production": {
@@ -27,9 +30,8 @@
         "buildType": "apk"
       },
       "env": {
-    "EXPO_PUBLIC_BACKEND_URL": "https://spendilytics-server-i429.vercel.app"
-  }
-
+        "EXPO_PUBLIC_BACKEND_URL": "https://spendilytics-server.vercel.app"
+      }
     }
   },
   "submit": {

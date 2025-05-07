@@ -104,6 +104,11 @@ export default {
       eas: {
         projectId: "cdefeddf-ee4e-4523-bd2e-4f58379f8623"
       },
+      googleSignIn: {
+        webClientId: "482424704215-55mudkvidkp7e60r3seuefi1uqkgeffp.apps.googleusercontent.com",
+        // androidClientId: "your-android-client-id.apps.googleusercontent.com", // <-- get from Google Console
+        // iosClientId: "your-ios-client-id.apps.googleusercontent.com" // (optional if you also want to support iOS)
+      },
       router: {
         origin: false
       },

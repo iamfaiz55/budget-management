@@ -1,8 +1,8 @@
 import { BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IUser } from "@/models/user.interface";
-// import { IUser } from "../../models/user.interface";
-console.log("env----:", process.env.EXPO_PUBLIC_BACKEND_URL);
+
+// console.log("env----:", process.env.EXPO_PUBLIC_BACKEND_URL);
 
 // Fetch token from AsyncStorage
 const getToken = async () => {

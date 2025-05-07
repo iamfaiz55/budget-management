@@ -3,10 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useGetAllTransactionsQuery } from '@/redux/transactionApi';
+import NetInfo from '@react-native-community/netinfo';
 
 const Day = () => {
   const { data, refetch, isLoading, error } = useGetAllTransactionsQuery();
   const router = useRouter();
+  const [isConnected, setIsConnected] = useState<boolean | null>(true);
+  const [showOnlineSnackbar, setShowOnlineSnackbar] = useState(false);
+
 // console.log("errorrr", error);
 useEffect(() => {
   
@@ -18,6 +22,22 @@ useEffect(() => {
     checkAuth();
   }
 }, []);
+
+
+useEffect(() => {
+  const unsubscribe = NetInfo.addEventListener(state => {
+    setIsConnected(state.isConnected);
+
+    if (state.isConnected) {
+      setShowOnlineSnackbar(true);
+      setTimeout(() => setShowOnlineSnackbar(false), 3000); // hide after 3s
+    }
+  });
+
+  return () => unsubscribe();
+}, []);
+
+
 
 
   const today = new Date().toISOString().split('T')[0];
@@ -67,6 +87,7 @@ useEffect(() => {
           <Text style={styles.columnText}>Total{"\n"}${calculateTotal('total')}</Text>
         </View>
       </View>
+      
 
       <View style={styles.transactionList}>
         <FlatList
@@ -184,4 +205,31 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 30,
   },
+  snackbarOffline: {
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+    position: 'absolute',
+    bottom: 100,
+    left: 20,
+    right: 20,
+    zIndex: 10,
+  },
+  snackbarOnline: {
+    backgroundColor: 'green',
+    padding: 10,
+    borderRadius: 5,
+    position: 'absolute',
+    bottom: 100,
+    left: 20,
+    right: 20,
+    zIndex: 10,
+  },
+  snackbarText: {
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  
 });
