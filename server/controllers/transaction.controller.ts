@@ -69,31 +69,52 @@ export const addTransaction = asyncHandler(async (req: Request, res: Response): 
 
 
 export const getAllTransactions = asyncHandler(async (req: Request, res: Response): Promise<any> => {
-    
-        let loggedUser: any = req.user;
+  const cacheKey = req.originalUrl;
 
-        const planBuyed = await Subscription.findOne({ admin: loggedUser.userId }).populate("users");
+  redisClient.get(cacheKey, async (err, cachedData) => {
+      if (err) {
+          console.error("Redis GET error:", err);
+          // Fallback to DB query if Redis fails
+      }
 
-        let userIds = [loggedUser.userId];
+      if (cachedData) {
+          const parsed = JSON.parse(cachedData);
+          return res.status(200).json(parsed);
+      }
 
-        if (planBuyed) {
-          
-            const planUserIds = planBuyed.users.map((user: any) => user._id.toString());
-            userIds = [...new Set([...userIds, ...planUserIds])]; 
-        }
+      // Proceed with DB queries if cache miss
+      let loggedUser: any = req.user;
 
-        const transactions = await Transactions.find({ user: { $in: userIds } }).populate("user");
-        const user = await User.findById(loggedUser.userId);
-        const balance = user?.balance || 0;
-          redisClient.setex(req.originalUrl, 3600, JSON.stringify({ message: "Transaction Fetch success From Redis", result:transactions, balance }))
-        
-        res.status(200).json({
-            message: "Transaction Fetch Success",
-           result: transactions,
-           balance
-        });
-  
+      const planBuyed = await Subscription.findOne({ admin: loggedUser.userId }).populate("users");
+
+      let userIds = [loggedUser.userId];
+
+      if (planBuyed) {
+          const planUserIds = planBuyed.users.map((user: any) => user._id.toString());
+          userIds = [...new Set([...userIds, ...planUserIds])];
+      }
+
+      const transactions = await Transactions.find({ user: { $in: userIds } }).populate("user");
+      const user = await User.findById(loggedUser.userId);
+      const balance = user?.balance || 0;
+
+      const response = {
+          message: "Transaction Fetch success From Redis",
+          result: transactions,
+          balance,
+      };
+
+      redisClient.setex(cacheKey, 3600, JSON.stringify(response)); // Cache for 1 hour
+
+      res.status(200).json({
+          message: "Transaction Fetch Success",
+          result: transactions,
+          balance,
+      });
+  });
 });
+
+
 
 
 

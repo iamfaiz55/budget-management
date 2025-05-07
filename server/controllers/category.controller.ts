@@ -11,19 +11,40 @@ import redisClient from "../services/redisClient";
 // ✅ GET: Fetch categories (admin + personal)
 export const getCategories = asyncHandler(async (req: Request, res: Response) => {
   const user = req.user as IUserProtected;
+  const cacheKey = req.originalUrl;
 
-  const categories = await Category.find({
-    $or: [
-      { createdBy: null }, // Admin/global categories
-      { createdBy: user.userId }, // User's own categories
-    ],
-  }).lean();
-  redisClient.setex(req.originalUrl, 3600, JSON.stringify({ message: "Categories fetched successfully From Redis", result:categories }))
+  redisClient.get(cacheKey, async (err, cachedData) => {
+    if (err) {
+      console.error("Redis GET error:", err);
+      // Fallback: proceed with DB fetch if Redis fails
+    }
 
-  // console.log("user categories", categories);
-  
+    if (cachedData) {
+      const parsed = JSON.parse(cachedData);
+      return res.status(200).json(parsed); // Return cached response
+    }
 
-  res.status(200).json({ message: "Categories fetched successfully",result:  categories });
+    // If cache miss, query MongoDB
+    const categories = await Category.find({
+      $or: [
+        { createdBy: null },               // Global (admin-defined) categories
+        { createdBy: user.userId },        // User-created categories
+      ],
+    }).lean();
+
+    const response = {
+      message: "Categories fetched successfully From Redis",
+      result: categories,
+    };
+
+    // Cache the result for 1 hour
+    redisClient.setex(cacheKey, 3600, JSON.stringify(response));
+
+    res.status(200).json({
+      message: "Categories fetched successfully",
+      result: categories,
+    });
+  });
 });
 
 // ✅ POST: Add category

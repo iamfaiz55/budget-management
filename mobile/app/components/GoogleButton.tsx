@@ -1,19 +1,25 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { Text, TouchableRipple } from 'react-native-paper';
 import GoogleIcon from './GoogleIcon';
 
-const GoogleLoginButton = ({ onPress }: any) => {
+const GoogleLoginButton = ({ onPress, loading = false, disabled = false }: any) => {
     return (
         <TouchableRipple
-            onPress={onPress}
-            style={styles.button}
+            onPress={loading || disabled ? undefined : onPress}
+            style={[styles.button, disabled && styles.disabledButton]}
             rippleColor="rgba(0, 0, 0, .1)"
             borderless={false}
         >
             <View style={styles.content}>
-                <GoogleIcon width={20} height={20} />
-                <Text style={styles.text}>Sign in with Google</Text>
+                {loading ? (
+                    <ActivityIndicator size="small" color="#000" />
+                ) : (
+                    <>
+                        <GoogleIcon width={20} height={20} />
+                        <Text style={styles.text}>Sign in with Google</Text>
+                    </>
+                )}
             </View>
         </TouchableRipple>
     );
@@ -31,13 +37,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         marginTop: 10,
     },
+    disabledButton: {
+        opacity: 0.6,
+    },
     content: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-    },
-    icon: {
-        marginRight: 12,
     },
     text: {
         color: '#333',

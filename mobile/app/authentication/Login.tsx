@@ -15,6 +15,7 @@ const [signInWithGoogle, {isSuccess, data:googleLoginData, error:googleLoginErro
   const [username, setUsername] = useState("");
   const [otp, setOtp] = useState("");
   const [showOTPField, setShowOTPField] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const [sendOTP, { isSuccess: otpSent, isLoading: otpLoading, isError: sendError, error }] = useSignInMutation();
   const [verifyOTP, { isSuccess: verified, data: verifyData, isLoading: verifying , data}] = useVerifyOTPMutation();
@@ -47,31 +48,36 @@ const [signInWithGoogle, {isSuccess, data:googleLoginData, error:googleLoginErro
 
 const handleGoogleSignIn = async () => {
   try {
+    setGoogleLoading(true); // 👈 start loading
+
     await GoogleSignin.hasPlayServices();
     const userInfo = await GoogleSignin.signIn();
 
     const idToken = userInfo?.data?.idToken;
 
     if (!idToken) {
+      setGoogleLoading(false);
       console.error("Google ID token is missing.");
       return;
     }
 
-    const response = await signInWithGoogle({ idToken }); 
+    const response = await signInWithGoogle({ idToken });
 
     if ('data' in response && response.data?.result?.token) {
       await AsyncStorage.setItem("authToken", response.data.result.token);
       await AsyncStorage.setItem("user", JSON.stringify(response.data.result));
       router.replace("/");
     } else {
-      console.error("Login failed:", response);
       Alert.alert("Login Failed", "Invalid login response from server.");
     }
   } catch (error: any) {
-    console.log("Google Sign-In error", error);
+    console.error("Google Sign-In error", error);
     Alert.alert("Error", "Google Sign-In failed. Please try again.");
+  } finally {
+    setGoogleLoading(false); // 👈 stop loading
   }
 };
+
 
 
 
@@ -260,7 +266,7 @@ useEffect(() => {
             </Button>
           </>
         )}
-        <GoogleLoginButton onPress={handleGoogleSignIn} />
+        <GoogleLoginButton loading={googleLoading} onPress={handleGoogleSignIn} />
 {/* <GoogleLoginButton/> */}
 <Button
   onPress={async () => {
