@@ -16,7 +16,6 @@ const baseQuery = fetchBaseQuery({
         return headers;
     },
 });
-
 //  .post("/send-otp-register", authController.requestRegistrationOTP)
 //     .post("/verify-register", authController.verifyRegistrationOTP)
 //     .post("/register", authController.registerUser)

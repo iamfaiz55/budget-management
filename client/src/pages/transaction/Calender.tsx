@@ -11,54 +11,61 @@ const Calendar: React.FC = () => {
   const { data } = useGetAllTransactionsQuery();
   const navigate = useNavigate();
   const [events, setEvents] = useState<any[]>([]);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
-    if (data && data.result) {
+    if (data?.result) {
       const transactionMap: { [date: string]: number } = {};
-  
+
       data.result.forEach(({ date, amount, type, isTransfered }) => {
-        // ⛔ Skip transferred transactions
         if (isTransfered) return;
-  
-        if (!transactionMap[date]) {
-          transactionMap[date] = 0;
-        }
-  
+
+        transactionMap[date] = transactionMap[date] || 0;
         transactionMap[date] += type === "income" ? amount : -amount;
       });
-  
+
       const newEvents = Object.entries(transactionMap).map(([date, balance]) => ({
         title: `Balance: ${balance}`,
         start: date,
-        color: balance < 0 ? "red" : "green",
+        color: balance < 0 ? "#f87171" : "#4ade80", // Tailwind red/green
       }));
-  
+
       setEvents(newEvents);
     }
   }, [data]);
-  
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640); // Tailwind's sm breakpoint
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const handleDateClick = (info: any) => {
-    const selectedDate = info.dateStr;
-    navigate(`/user/form/${selectedDate}`);
+    navigate(`/user/form/${info.dateStr}`);
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen py-10">
-      <div className="bg-white shadow-xl rounded-lg p-6 w-full max-w-4xl">
+    <div className="flex flex-col items-center min-h-screen px-2 py-4 sm:px-4 md:px-6">
+      <div className="bg-white shadow rounded-lg p-2 sm:p-4 md:p-6 w-full max-w-full sm:max-w-2xl md:max-w-4xl">
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
-          initialView="dayGridMonth"
-          height="500px"
+          initialView={isMobile ? "listWeek" : "dayGridMonth"}
+          height={isMobile ? "auto" : "500px"}
           headerToolbar={{
-            left: "prev,next today",
-            center: "title",
-            right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
+            left: isMobile ? "prev,next" : "prev,next today",
+            center: isMobile ? "" : "title",
+            right: isMobile
+              ? "listWeek"
+              : "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
           }}
           events={events}
           dateClick={handleDateClick}
-          editable={true}
+          editable={false}
           selectable={true}
-          dayMaxEventRows={3}
+          dayMaxEventRows={2}
           buttonText={{
             today: "Today",
             month: "Month",

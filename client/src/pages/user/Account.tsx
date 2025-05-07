@@ -137,118 +137,100 @@ const openRazorpay = async () => {
 
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-gray-100 min-h-screen space-y-6">
-      {/* Profile Section */}
-      <div className="bg-white flex items-center p-6 rounded-lg shadow-md">
-        <img src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-male-user-profile-vector-illustration-isolated-background-man-profile-sign-business-concept_157943-38764.jpg?semt=ais_hybrid" className="w-16 h-16 rounded-full" alt="Avatar" />
-        <div className="ml-4">
-          <h2 className="text-xl font-bold">{user && user.name}</h2>
-          <p className="text-gray-500">{user && user.email}</p>
-        </div>
-      </div>
-
-      {/* Spending Summary */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        {/* <h3 className="text-lg font-bold mb-2">Select Month:</h3> */}
-    
-
-        {/* <h3 className="text-lg font-bold mt-4">Spending Summary ({selectedMonth})</h3> */}
-        <div className="mt-2 space-y-2">
-          {/* <SpendingItem label="Total Account Spent" amount="$4,500.00" color="text-blue-500" /> */}
-          <div className="flex justify-between p-2 bg-gray-50 rounded-md">
-    <span>Available Balance</span>
-    <span className={`font-bold text-blue-500`}>{allTransactions && allTransactions.balance}</span>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-14 bg-gray-100 min-h-screen space-y-6">
+  {/* Profile Section */}
+  <div className="bg-white flex flex-col sm:flex-row items-center sm:items-start p-6 rounded-lg shadow-md gap-4">
+    <img
+      src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-male-user-profile-vector-illustration-isolated-background-man-profile-sign-business-concept_157943-38764.jpg?semt=ais_hybrid"
+      className="w-20 h-20 rounded-full"
+      alt="Avatar"
+    />
+    <div className="text-center sm:text-left">
+      <h2 className="text-xl font-bold">{user && user.name}</h2>
+      <p className="text-gray-500">{user && user.email}</p>
+    </div>
   </div>
-        </div>
-      </div>
 
-      {/* Subscription Plans */}
-      <h3 className="text-xl font-bold">{myPlan && myPlan.result.isActive ? "Your Active Plan": "Choose Your Plan"}</h3>
-      {/* <h3 className="text-xl font-bold">Choose Your Plan</h3> */}
-      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <PlanCard title="Basic Plan" price="$4.99/month" features={["Limited Transactions", "Basic Reports"]} bgColor="bg-gray-200" />
-        <PlanCard title="Standard Plan" price="$7.99/month" features={["Unlimited Transactions", "Advanced Reports"]} bgColor="bg-blue-400" textColor="text-white" />
-        <PlanCard title="Premium Plan" price="$9.99/month" features={["All Features", "Priority Support"]} bgColor="bg-green-500" textColor="text-white" />
-      </div> */}
-  <>
-    {
-      myPlan && myPlan.result.isActive
-      ? <>
+  {/* Spending Summary */}
+  <div className="bg-white p-6 rounded-lg shadow-md">
+    <div className="flex flex-col sm:flex-row justify-between items-center p-4 bg-gray-50 rounded-md text-sm sm:text-base">
+      <span>Available Balance</span>
+      <span className="font-bold text-blue-500">{allTransactions?.balance}</span>
+    </div>
+  </div>
+
+  {/* Subscription Plans */}
+  <h3 className="text-xl sm:text-2xl font-bold text-center sm:text-left">
+    {myPlan?.result?.isActive ? "Your Active Plan" : "Choose Your Plan"}
+  </h3>
+
+  {myPlan?.result?.isActive ? (
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="w-full max-w-4xl mx-auto p-6 md:p-10 rounded-lg shadow-xl bg-white text-center space-y-4"
+    >
+      <h3 className="text-2xl sm:text-3xl font-bold">🎉 Your Active Plan</h3>
+      <p className="text-xl font-semibold text-green-600">{myPlan.result.plan.name}</p>
+      <p className="text-gray-700 text-base sm:text-lg">💰 Price: <span className="font-bold">${myPlan.result.plan.price}</span></p>
+      <p className="text-gray-700 text-base sm:text-lg">⏳ Duration: <span className="font-bold">{myPlan.result.plan.duration} Days</span></p>
+      <p className="text-gray-700 text-base sm:text-lg">
+        📅 Start Date: <span className="font-bold">{new Date(myPlan.result.startDate).toLocaleDateString("en-GB")}</span>
+      </p>
+      <p className="text-gray-700 text-base sm:text-lg">
+        🚀 End Date: <span className="font-bold">{new Date(myPlan.result.endDate).toLocaleDateString("en-GB")}</span>
+      </p>
+      <p className="text-red-600 font-bold text-base sm:text-lg">⏳ Days Left: {calculateDaysLeft(myPlan.result.endDate)} Days</p>
+    </motion.div>
+  ) : (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {data?.result.map((plan, index) => (
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-4xl  p-10 rounded-lg shadow-xl  text-center"
+          key={plan._id}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: index * 0.2 }}
+          className="p-6 bg-white border rounded-2xl shadow-md text-center hover:shadow-xl transition-transform transform hover:scale-105"
         >
-          <h3 className="text-3xl font-bold mb-6">🎉 Your Active Plan</h3>
-          <div className="bg-white p-6 rounded-xl text-gray-800 shadow-md">
-            <p className="text-2xl font-semibold text-green-600">{myPlan.result.plan.name}</p>
-            <p className="text-gray-700 text-lg mt-2">💰 Price: <span className="font-bold">${myPlan.result.plan.price}</span></p>
-            <p className="text-gray-700 text-lg mt-2">⏳ Duration: <span className="font-bold">{myPlan.result.plan.duration} Days</span></p>
-            <p className="text-gray-700 text-lg mt-2">
-  📅 Start Date: <span className="font-bold">
-    {new Date(myPlan.result.startDate).toLocaleDateString('en-GB')}
-  </span>
-</p>
-<p className="text-gray-700 text-lg mt-2">
-  🚀 End Date: <span className="font-bold">
-    {new Date(myPlan.result.endDate).toLocaleDateString('en-GB')}
-  </span>
-</p>
-<p className="text-red-600 text-lg font-bold mt-4">⏳ Days Left: {calculateDaysLeft(myPlan.result.endDate)} Days</p>
+          <h3 className="text-xl font-semibold text-blue-600">{plan.name}</h3>
+          <div className="flex flex-wrap justify-center gap-3 mt-4 text-sm text-gray-700">
+            <p className="bg-gray-200 px-3 py-1 rounded-lg font-medium">💰 ${plan.price}</p>
+            <p className="bg-gray-200 px-3 py-1 rounded-lg font-medium">👥 {plan.maxUsers} Users</p>
+            <p className="bg-gray-200 px-3 py-1 rounded-lg font-medium">📅 {plan.duration} Days</p>
+          </div>
+          <div className="mt-6">
+            <motion.button
+              onClick={() => plan._id && handleBuyPlan(plan._id, plan.price)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-yellow-500 text-white px-5 py-2 rounded-full font-semibold shadow hover:bg-yellow-400 transition"
+            >
+              Buy Plan
+            </motion.button>
           </div>
         </motion.div>
-      </>
-      : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
-       {data &&
-              data.result.map((plan, index) => (
-                <motion.div
-                  key={plan._id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: index * 0.2 }}
-                  className="p-6 bg-white border rounded-2xl shadow-xl text-center hover:shadow-2xl transition-transform transform hover:scale-105"
-                >
-                  <h3 className="text-2xl font-semibold text-blue-600">{plan.name}</h3>
-                  <div className="flex flex-wrap justify-center gap-4 mt-4 text-gray-700">
-                    <p className="bg-gray-200 px-3 py-1 rounded-lg font-bold">💰 ${plan.price}</p>
-                    <p className="bg-gray-200 px-3 py-1 rounded-lg font-bold">👥 {plan.maxUsers} Users</p>
-                    <p className="bg-gray-200 px-3 py-1 rounded-lg font-bold">📅 {plan.duration} Days</p>
-                  </div>
-                  <div className="flex justify-center gap-4 mt-6">
-                    <motion.button
-                      onClick={() => plan._id && handleBuyPlan(plan._id, plan.price)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="bg-yellow-500 text-white px-6 py-2 rounded-full font-semibold shadow-md hover:bg-yellow-400 transition"
-                    >
-                      Buy Plan
-                    </motion.button>
-                  </div>
-                </motion.div>
-              ))}
-      </div>
-    }
-           
-          </>
-
-
-      {/* Settings Section */}
-      <div className="bg-white rounded-lg shadow-md">
-        <OptionItem label="Settings" />
-        <OptionItem label="Notifications" />
-        <OptionItem label="Reports" />
-        <OptionItem label="Help & Support" />
-      </div>
-
-      {/* Logout Button */}
-      <button
-        className="w-full flex items-center justify-center bg-red-500 text-white px-4 py-3 rounded-md font-bold"
-        onClick={() => logout()}
-      >
-        Logout
-      </button>
+      ))}
     </div>
+  )}
+
+  {/* Settings Section */}
+  <div className="bg-white rounded-lg shadow-md divide-y">
+    <OptionItem label="Settings" />
+    <OptionItem label="Notifications" />
+    <OptionItem label="Reports" />
+    <OptionItem label="Help & Support" />
+  </div>
+
+  {/* Logout Button */}
+  <button
+    className="w-full bg-red-500 text-white px-4 py-3 rounded-md font-bold hover:bg-red-600 transition"
+    onClick={() => logout()}
+  >
+    Logout
+  </button>
+</div>
+
   );
 };
 
